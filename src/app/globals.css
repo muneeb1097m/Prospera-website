@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot LT Std Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot LT Std Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot Bold Italic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/fonts/Metropolis-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/fonts/Metropolis-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/fonts/Metropolis-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/fonts/Metropolis-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/fonts/Metropolis-BlackItalic.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+}
+
+@theme {
+  --color-accent: #FEACC6;
+  --color-accent-hover: #fca1be;
+  --color-dark: #111315;
+  --color-primary: #2D2D2D;
+
+  --font-sans: 'Metropolis', var(--font-montserrat), sans-serif;
+  --font-serif: 'Didot', serif;
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #111315;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Metropolis', sans-serif;
+}
+
+/* Removed the !important tag so we can actually override headings when needed */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Didot', serif;
+}
+
+/* Added !important to the utility classes so they always work when you apply them */
+.font-serif {
+  font-family: 'Didot', serif !important;
+}
+
+.font-sans {
+  font-family: 'Metropolis', sans-serif !important;
+}
+
+span.italic {
+  font-style: italic !important;
 }
