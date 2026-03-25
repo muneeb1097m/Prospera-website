@@ -8,7 +8,7 @@ const steps = [
         number: "1",
         title: "Intro Call & Scope Review",
         description: "We begin with a short conversation to understand your business, current bookkeeping setup, and goals. We confirm whether your books are ready for recurring service or if a one-time cleanup is needed first.",
-        image: "/introcall.png",
+        image: "/Intro-Call.png",
         isImageLeft: true,
     },
     {
