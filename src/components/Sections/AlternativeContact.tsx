@@ -12,8 +12,8 @@ const contactOptions = [
     {
         icon: <Phone className="w-5 h-5 text-[#FEACC6]" />,
         label: "Phone Number",
-        value: "+1 (910) 872-3200",
-        href: "tel:+1 (910) 872-3200",
+        value: "+1 (336) 860-7529",
+        href: "tel:+13368607529",
     },
     {
         icon: <Clock className="w-5 h-5 text-[#FEACC6]" />,

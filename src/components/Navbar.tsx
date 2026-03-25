@@ -127,7 +127,7 @@ export default function Navbar() {
                                 <p className="text-[13px] font-sans font-bold text-gray-400 uppercase tracking-widest">Connect</p>
                                 <div className="flex flex-col gap-2">
                                     <a href="mailto:jenna@prosperagroup.us" className="text-[#1A1A1A] font-sans">jenna@prosperagroup.us</a>
-                                    <a href="tel:+19108723200" className="text-[#1A1A1A] font-sans">+1 (910) 872-3200</a>
+                                    <a href="tel:+13368607529" className="text-[#1A1A1A] font-sans">+1 (336) 860-7529</a>
                                 </div>
                             </div>
                         </div>
