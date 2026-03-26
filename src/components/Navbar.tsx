@@ -27,7 +27,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center flex-shrink-0 relative z-[60]">
                     <Image
-                        src="/logo.png"
+                        src="/logo2.png"
                         alt="Prospera Logo"
                         width={180}
                         height={50}
@@ -126,7 +126,7 @@ export default function Navbar() {
                             <div className="mt-12 space-y-4">
                                 <p className="text-[13px] font-sans font-bold text-gray-400 uppercase tracking-widest">Connect</p>
                                 <div className="flex flex-col gap-2">
-                                    <a href="mailto:jenna@prosperagroup.us" className="text-[#1A1A1A] font-sans">jenna@prosperagroup.us</a>
+                                    <a href="mailto:admin@prosperagroup.us" className="text-[#1A1A1A] font-sans">admin@prosperagroup.us</a>
                                     <a href="tel:+13368607529" className="text-[#1A1A1A] font-sans">+1 (336) 860-7529</a>
                                 </div>
                             </div>

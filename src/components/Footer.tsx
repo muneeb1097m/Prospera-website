@@ -14,7 +14,7 @@ export default function Footer() {
                     <div className="flex flex-col gap-6">
                         <div className="w-[180px]">
                             <Image
-                                src="/footerlogo.svg"
+                                src="/footerlogo.png"
                                 alt="Prospera Logo"
                                 width={180}
                                 height={70}
@@ -52,7 +52,7 @@ export default function Footer() {
                         <ul className="flex flex-col gap-5 text-[15px] font-sans font-light text-[#444]">
                             <li className="flex items-center gap-3">
                                 <Mail size={18} className="text-[#111315]" />
-                                <a href="mailto:jenna@prosperagroup.us" className="hover:text-[#FEACC6] transition-colors">jenna@prosperagroup.us</a>
+                                <a href="mailto:admin@prosperagroup.us" className="hover:text-[#FEACC6] transition-colors">admin@prosperagroup.us</a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={18} className="text-[#111315]" />
@@ -60,7 +60,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin size={18} className="text-[#111315] shrink-0 mt-[2px]" />
-                                <span className="leading-relaxed">Serving U.S. Small Businesses</span>
+                                <span className="leading-relaxed">3300 Battleground Ave Suite 310 Greensboro, NC 27410</span>
                             </li>
                         </ul>
                     </div>

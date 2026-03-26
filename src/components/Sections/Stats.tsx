@@ -47,25 +47,52 @@ export default function Stats({ data }: StatsProps) {
             </div>
 
             {/* Right Side - Lighter shade (30%) */}
-            <div className="lg:w-[30%] bg-[#47515D] flex items-center justify-center py-20 px-6 lg:px-12 border-l border-white/10">
-                <div className="w-full max-w-sm space-y-12">
-                    {statsList.map((stat, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            className="pb-10 border-b border-white/10 last:border-0"
-                        >
-                            <span className="text-[13px] uppercase tracking-[0.15em] text-gray-400 font-sans font-medium mb-4 block">
-                                {stat.label}
-                            </span>
-                            <span className="text-5xl lg:text-5xl font-extrabold text-white font-sans tracking-tight">
-                                {stat.value}
-                            </span>
-                        </motion.div>
-                    ))}
+            <div className="lg:w-[30%] bg-[#47515D] flex flex-col justify-center py-20 px-6 lg:px-12 border-l border-white/10">
+                <div className="w-full max-w-sm space-y-10">
+                    {/* Header for Right Side */}
+                    <motion.h3 
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        className="text-white font-serif text-2xl lg:text-3xl mb-4 border-b border-white/10 pb-6"
+                    >
+                        Why Clients Trust Prospera
+                    </motion.h3>
+
+                    {/* Trust Blocks */}
+                    <div className="space-y-8">
+                        {[
+                            { 
+                                title: "Clear Scope", 
+                                desc: "Defined pricing and services based on actual work needed" 
+                            },
+                            { 
+                                title: "Structured Process", 
+                                desc: "A consistent system for onboarding, bookkeeping, and ongoing support." 
+                            },
+                            { 
+                                title: "Accurate & Tax-Ready", 
+                                desc: "Books kept organized, reconciled, and prepared for tax season." 
+                            }
+                        ].map((item, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: index * 0.1 }}
+                                className="group"
+                            >
+                                <h4 className="text-[14px] uppercase tracking-[0.15em] text-[#FEACC6] font-sans font-bold mb-2">
+                                    {item.title}
+                                </h4>
+                                <p className="text-[1.05rem] text-gray-200 leading-relaxed font-sans font-light">
+                                    {item.desc}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>

@@ -15,8 +15,10 @@ export const PAGE_QUERY = groq`*[_type == "page" && slug.current == $slug][0]{
   sections[]{
     _type == "hero" => {
       _type,
-      title,
-      italicTitle,
+      titleLine1,
+      titleLine2Italic,
+      titleLine2Normal,
+      titleLine3,
       subtitle,
       ctaText,
       image

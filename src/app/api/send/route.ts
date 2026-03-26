@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await resend.emails.send({
       from: 'Prospera Group USA <leads@prosperagroup.us>',
-      to: ['lucius@prosperagroup.us', 'jenna@prosperagroup.us'],
+      to: ['lucius@prosperagroup.us', 'admin@prosperagroup.us'],
       subject: 'knock knock new lead',
       html: `
         <h2>New Lead from Prospera Website</h2>

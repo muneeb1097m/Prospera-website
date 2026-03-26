@@ -18,7 +18,7 @@ export default function AboutFounder() {
                     >
                         <div className="relative w-full h-[450px] lg:h-[650px] rounded-[12px] overflow-hidden">
                             <Image
-                                src="/CEO.jpg"
+                                src="/jenna3.jpg"
                                 alt="Prospera Founder"
                                 fill
                                 className="object-cover"

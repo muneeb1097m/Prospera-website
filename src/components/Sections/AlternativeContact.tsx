@@ -6,8 +6,8 @@ const contactOptions = [
     {
         icon: <Mail className="w-5 h-5 text-[#FEACC6]" />,
         label: "Email Address",
-        value: "Jenna@Prosperagroup.Us",
-        href: "mailto:Jenna@Prosperagroup.Us",
+        value: "admin@prosperagroup.us",
+        href: "mailto:admin@prosperagroup.us",
     },
     {
         icon: <Phone className="w-5 h-5 text-[#FEACC6]" />,
