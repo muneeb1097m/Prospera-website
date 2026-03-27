@@ -8,6 +8,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Contact Us",
     description: "Get in touch with Prospera Group USA for specialized bookkeeping services.",
+    alternates: {
+        canonical: "/contact",
+    },
 };
 
 export default function ContactPage() {

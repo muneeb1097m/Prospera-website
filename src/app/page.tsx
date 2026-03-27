@@ -25,6 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
             description: seo?.metaDescription,
             images: seo?.shareImage?.asset?.url ? [seo.shareImage.asset.url] : [],
         },
+        alternates: {
+            canonical: "/",
+        },
     };
 }
 

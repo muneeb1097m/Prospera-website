@@ -11,6 +11,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Our Services",
     description: "Explore our range of bookkeeping services, including monthly reporting, financial insights, and cleanup services.",
+    alternates: {
+        canonical: "/services",
+    },
 };
 
 export default function ServicesPage() {

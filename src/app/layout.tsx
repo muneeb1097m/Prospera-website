@@ -24,9 +24,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL("https://prosperabookkeeping.com"), // Replace with actual domain if different
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "Prospera Group USA - Premium Bookkeeping Services",
     description: "Recurring Monthly Bookkeeping for U.S. Small Businesses.",

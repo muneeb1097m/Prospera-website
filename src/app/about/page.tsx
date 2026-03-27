@@ -10,6 +10,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
     title: "About Us",
     description: "Learn more about Prospera Group USA and our dedicated team of bookkeeping professionals.",
+    alternates: {
+        canonical: "/about",
+    },
 };
 
 export default function AboutPage() {
