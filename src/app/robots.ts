@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/studio/',
     },
-    sitemap: 'https://prosperabookkeeping.com/sitemap.xml',
+    sitemap: 'https://prosperagroup.us/sitemap.xml',
   }
 }

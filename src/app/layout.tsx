@@ -25,11 +25,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://prosperabookkeeping.com"), // Replace with actual domain if different
+  metadataBase: new URL("https://prosperagroup.us"), // Replace with actual domain if different
   openGraph: {
     title: "Prospera Group USA - Premium Bookkeeping Services",
     description: "Recurring Monthly Bookkeeping for U.S. Small Businesses.",
-    url: "https://prosperabookkeeping.com",
+    url: "https://prosperagroup.us",
     siteName: "Prospera Group USA",
     images: [
       {

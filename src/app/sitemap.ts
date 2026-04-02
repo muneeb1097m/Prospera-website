@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://prosperabookkeeping.com'
+  const baseUrl = 'https://prosperagroup.us'
   
   return [
     {
