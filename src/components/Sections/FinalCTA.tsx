@@ -3,7 +3,17 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function FinalCTA() {
+interface FinalCTAProps {
+    headline?: string;
+    body?: string;
+    buttonText?: string;
+}
+
+export default function FinalCTA({
+    headline = "Ready for Clearer Numbers and Better Financial Organization?",
+    body = "If your business has reached the point where your numbers should be working harder for you, Prospera can help you understand exactly where things stand and what needs to change.",
+    buttonText = "Schedule a Financial Structure Review"
+}: FinalCTAProps) {
     return (
         <section className="bg-[#111315] text-white overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch w-full">
@@ -18,16 +28,15 @@ export default function FinalCTA() {
                         className="max-w-[550px] relative z-10"
                     >
                         <h2 className="text-[2.5rem] lg:text-[4rem] font-serif font-normal leading-[1.1] mb-6">
-                            Ready for Structured <br />
-                            Monthly Bookkeeping?
+                            {headline}
                         </h2>
                         
-                        <p className="text-[1rem] lg:text-[1.125rem] text-[#cccccc] font-sans font-light mb-10 leading-relaxed max-w-[380px]">
-                            Schedule an intro call to determine if recurring bookkeeping is the right fit for your business.
+                        <p className="text-[1rem] lg:text-[1.125rem] text-[#cccccc] font-sans font-light mb-10 leading-relaxed max-w-[420px]">
+                            {body}
                         </p>
                         
                         <Link href="/contact" className="bg-white text-black px-10 py-4 font-sans font-extrabold text-[13px] rounded-[8px] hover:bg-gray-200 transition-colors uppercase tracking-widest inline-block">
-                            CONTACT US
+                            {buttonText}
                         </Link>
                     </motion.div>
                 </div>

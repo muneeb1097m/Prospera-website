@@ -2,38 +2,28 @@
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 
-interface HowItWorksProps {
-    data?: {
-        heading?: string;
-        steps?: { title: string; description: string; iconName: string }[];
-        noteTitle?: string;
-        noteText?: string;
-    }
-}
-
-const defaultSteps = [
-    {
-        title: "Intro Call",
-        description: "A consultation to assess your needs.",
-        iconName: "Phone",
-    },
-    {
-        title: "Transparent Setup",
-        description: "Secure account connection and plan selection.",
-        iconName: "Monitor",
-    },
-    {
-        title: "Recurring Support",
-        description: "We handle the monthly heavy lifting.",
-        iconName: "Headset",
-    },
-];
-
-export default function HowItWorks({ data }: HowItWorksProps) {
-    const heading = data?.heading || "How It Works";
-    const steps = data?.steps || defaultSteps;
-    const noteTitle = data?.noteTitle || "Note";
-    const noteText = data?.noteText || "Recurring services begin after onboarding. Historical cleanup or \"catch-up\" work for past months is assessed and quoted separately.";
+export default function HowItWorks() {
+    const heading = "How It Works";
+    const noteTitle = "Note";
+    const noteText = "Recurring services begin after onboarding. Historical cleanup or \"catch-up\" work for past months is assessed and quoted separately.";
+    
+    const steps = [
+        {
+            title: "Financial Structure Review",
+            description: "A comprehensive diagnostic review to identify structural gaps in your books.",
+            iconName: "Phone",
+        },
+        {
+            title: "Structured Onboarding",
+            description: "Secure tool connection, account cleanup, and clean structure alignment.",
+            iconName: "Monitor",
+        },
+        {
+            title: "Practical Support",
+            description: "Consistent monthly reconciliation, clean reports, and tax-ready structure.",
+            iconName: "Headset",
+        },
+    ];
 
     return (
         <section className="bg-[#3B4451] pt-16 lg:pt-20 pb-16 lg:pb-24 text-white overflow-hidden">

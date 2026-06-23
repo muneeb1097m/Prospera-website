@@ -1,5 +1,5 @@
 "use client";
-import { Mail, Phone, MapPin, Instagram, Linkedin, Facebook, Twitter } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -22,14 +22,11 @@ export default function Footer() {
                             />
                         </div>
                         <p className="text-[15px] leading-relaxed text-[#444] max-w-sm font-sans font-light">
-                            A structured monthly system that keeps your books accurate, your taxes predictable, and your decisions clearer year-round.
+                            Prospera Group USA LLC helps growing businesses gain cleaner bookkeeping, clearer financial reporting, tax-ready organization, and better financial visibility for decision-making.
                         </p>
-                        <div className="flex items-center gap-5 pt-2 text-[#111315]">
-                            <Link href="#" className="hover:text-[#FEACC6] transition-colors"><Instagram size={20} /></Link>
-                            <Link href="#" className="hover:text-[#FEACC6] transition-colors"><Linkedin size={20} /></Link>
-                            <Link href="#" className="hover:text-[#FEACC6] transition-colors"><Facebook size={20} /></Link>
-                            <Link href="#" className="hover:text-[#FEACC6] transition-colors"><Twitter size={20} /></Link>
-                        </div>
+                        <p className="text-[14px] leading-relaxed text-[#666] max-w-sm font-sans font-light mt-2">
+                            Based in Greensboro, North Carolina. Supporting businesses across the U.S.
+                        </p>
                     </div>
 
                     {/* Quick Links */}
@@ -40,7 +37,7 @@ export default function Footer() {
                             <li><Link href="/about" className="hover:text-[#FEACC6] transition-colors">About</Link></li>
                             <li><Link href="/services" className="hover:text-[#FEACC6] transition-colors">Services</Link></li>
                             <li><Link href="/how-it-works" className="hover:text-[#FEACC6] transition-colors">How It Works</Link></li>
-                            <li><Link href="/contact" className="hover:text-[#FEACC6] transition-colors">Contact Us</Link></li>
+                            <li><Link href="/contact" className="hover:text-[#FEACC6] transition-colors">Start With a Review</Link></li>
                         </ul>
                     </div>
 

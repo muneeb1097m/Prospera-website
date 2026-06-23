@@ -71,7 +71,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-4 flex-shrink-0">
                     {/* CTA Button - Hidden on very small screens, visible on md+ */}
                     <Link href="/contact" className="hidden sm:flex bg-[#FEACC6] hover:bg-[#fca1be] text-[#1A1A1A] text-[13px] font-sans font-bold px-6 md:px-8 py-3 md:py-4 rounded-[8px] transition-colors uppercase tracking-[0.1em]">
-                        CONTACT US
+                        Start With a Review
                     </Link>
 
                     {/* Mobile Menu Toggle */}
@@ -119,7 +119,7 @@ export default function Navbar() {
                                 onClick={() => setIsMenuOpen(false)}
                                 className="w-full bg-[#FEACC6] text-[#1A1A1A] py-5 rounded-[12px] text-center font-sans font-bold text-[18px] uppercase tracking-widest shadow-lg active:scale-[0.98] transition-transform"
                             >
-                                CONTACT US
+                                Start With a Review
                             </Link>
                             
                             {/* Contact Info in Menu */}

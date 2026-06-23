@@ -6,8 +6,8 @@ import AlternativeContact from "@/components/Sections/AlternativeContact";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Contact Us",
-    description: "Get in touch with Prospera Group USA for specialized bookkeeping services.",
+    title: "Schedule a Financial Structure Review | Prospera Group Greensboro NC",
+    description: "Request a Financial Structure Review for bookkeeping, cleanup, reporting, tax-ready support, and clearer financial visibility.",
     alternates: {
         canonical: "/contact",
     },

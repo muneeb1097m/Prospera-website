@@ -79,6 +79,39 @@ export default function RootLayout({
             gtag('config', 'G-DCYZFW7028');
           `}
         </Script>
+        {/* Local Business Structured Data */}
+        <Script
+          id="schema-local-business"
+          type="application/ld+json"
+          strategy="afterInteractive"
+        >
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "Prospera Group USA LLC",
+              "image": "https://prosperagroup.us/og-image.png",
+              "@id": "https://prosperagroup.us/#localbusiness",
+              "url": "https://prosperagroup.us",
+              "telephone": "+13368607529",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "3300 Battleground Ave Suite 310",
+                "addressLocality": "Greensboro",
+                "addressRegion": "NC",
+                "postalCode": "27410",
+                "addressCountry": "US"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 36.126466,
+                "longitude": -79.843644
+              },
+              "areaServed": "US",
+              "priceRange": "$$"
+            }
+          `}
+        </Script>
         {children}
         <Analytics />
       </body>

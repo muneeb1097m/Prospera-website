@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function ServicesHero() {
     return (
         /* FIXED: Background updated to match your core brand dark gray */
-        <section className="relative bg-[#111315] text-white pt-40 pb-24 lg:pt-56 lg:pb-40 overflow-hidden text-center">
+        <section className="relative bg-[#111315] text-white pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -19,9 +19,12 @@ export default function ServicesHero() {
                     </div>
 
                     {/* FIXED HEADING: Using font-normal to keep Didot elegant and refined as per Figma */}
-                    <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[5.5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
-                        Recurring Monthly <br /> Bookkeeping Services
+                    <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
+                        Monthly Financial Clarity & Bookkeeping Support
                     </h1>
+                    <p className="text-[16px] lg:text-[19px] text-white/80 font-sans font-light max-w-3xl mx-auto mt-8 leading-relaxed">
+                        When your business has more moving parts, basic bookkeeping stops being enough. Prospera provides monthly financial support for businesses that need cleaner records, clearer reporting, tax-ready organization, and better visibility before decisions are made.
+                    </p>
                 </motion.div>
             </div>
 

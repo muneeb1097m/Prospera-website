@@ -1,24 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 
-interface StatsProps {
-    data?: {
-        heading?: string;
-        subtext?: string;
-        statsList?: { label: string; value: string }[];
-    }
-}
-
-const defaultStats = [
-    { label: "Trusted by Founders", value: "9000+" },
-    { label: "Since", value: "2016" },
-    { label: "Happy Clients", value: "6378" },
-];
-
-export default function Stats({ data }: StatsProps) {
-    const heading = data?.heading || "Prospera Provides";
-    const subtext = data?.subtext || "Recurring monthly bookkeeping for U.S. small businesses. We simplify your financial processes, provide clarity on your numbers, and ensure everything is organized and tax-ready year-round without confusing jargon or last-minute surprises.";
-    const statsList = data?.statsList || defaultStats;
+export default function Stats() {
+    const heading = "Monthly Financial Clarity & Bookkeeping Support";
+    const subtext = "Accurate bookkeeping, clear financial reporting, and tax-ready organization that help growing businesses understand their numbers and maintain control.";
 
     return (
         <section className="relative flex flex-col lg:flex-row min-h-[450px]">
@@ -57,23 +42,27 @@ export default function Stats({ data }: StatsProps) {
                         transition={{ duration: 0.6 }}
                         className="text-white font-serif text-2xl lg:text-3xl mb-4 border-b border-white/10 pb-6"
                     >
-                        Why Clients Trust Prospera
+                        Why Business Owners Trust Prospera
                     </motion.h3>
 
                     {/* Trust Blocks */}
                     <div className="space-y-8">
                         {[
                             { 
-                                title: "Clear Scope", 
-                                desc: "Defined pricing and services based on actual work needed" 
+                                title: "Better Financial Visibility", 
+                                desc: "You can see what is happening before payroll, taxes, or cash flow problems become stressful." 
                             },
                             { 
-                                title: "Structured Process", 
-                                desc: "A consistent system for onboarding, bookkeeping, and ongoing support." 
+                                title: "Tax-Ready Organization", 
+                                desc: "Your records are maintained throughout the year with tax season in mind." 
                             },
                             { 
-                                title: "Accurate & Tax-Ready", 
-                                desc: "Books kept organized, reconciled, and prepared for tax season." 
+                                title: "Clearer Reporting", 
+                                desc: "Your financial reports are easier to understand and use." 
+                            },
+                            { 
+                                title: "Cleaner Records", 
+                                desc: "Your books are organized, reconciled, and maintained consistently." 
                             }
                         ].map((item, index) => (
                             <motion.div

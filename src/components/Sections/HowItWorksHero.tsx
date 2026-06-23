@@ -5,7 +5,7 @@ import Image from "next/image"; // Added missing Image import
 export default function HowItWorksHero() {
     return (
         /* FIXED: Background updated to your core brand dark slate #111315 */
-        <section className="relative bg-[#111315] text-white pt-40 pb-24 lg:pt-56 lg:pb-40 overflow-hidden text-center">
+        <section className="relative bg-[#111315] text-white pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -19,9 +19,12 @@ export default function HowItWorksHero() {
                     </div>
                     
                     {/* FIXED HEADING: Changed font-medium to font-normal to keep Didot elegant */}
-                    <h1 className="text-[3rem] lg:text-[5.5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
-                        How Our Recurring <br /> Bookkeeping Works
+                    <h1 className="text-[2.5rem] lg:text-[5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
+                        How Prospera Builds Financial Clarity
                     </h1>
+                    <p className="text-[16px] lg:text-[19px] text-white/80 font-sans font-light max-w-3xl mx-auto mt-8 leading-relaxed">
+                        Prospera’s process is designed to help business owners move from unclear records and reactive decisions to cleaner books, clearer reporting, and stronger tax-ready organization.
+                    </p>
                 </motion.div>
             </div>
 

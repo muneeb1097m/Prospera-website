@@ -5,7 +5,7 @@ import Image from "next/image"; // Added missing Image import
 export default function ContactHero() {
     return (
         /* FIXED: Background updated to your core brand dark slate #111315 */
-        <section className="relative bg-[#111315] text-white pt-40 pb-24 lg:pt-56 lg:pb-40 overflow-hidden text-center">
+        <section className="relative bg-[#111315] text-white pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -19,8 +19,8 @@ export default function ContactHero() {
                     </div>
                     
                     {/* FIXED HEADING: Changed font-medium to font-normal for that premium, elegant serif look */}
-                    <h1 className="text-[3rem] lg:text-[5.5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
-                        Start Your Recurring <br /> Bookkeeping Plan
+                    <h1 className="text-[2.5rem] lg:text-[5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
+                        Request a Financial <br /> Structure Review
                     </h1>
                 </motion.div>
             </div>

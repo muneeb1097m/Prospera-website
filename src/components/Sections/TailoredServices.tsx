@@ -1,26 +1,36 @@
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-
-interface TailoredServicesProps {
-    data?: {
-        heading?: string;
-        services?: { title: string; image: any }[];
-    }
-}
 
 const defaultServices = [
-    { title: "Small Business Owners", image: "/SMO.jpg" },
-    { title: "Early-Stage Companies", image: "/ESC.jpg" },
-    { title: "Service-Based Businesses", image: "/SBB.jpg" },
     { 
-        title: "Founders Who Value Clarity And Consistency", 
+        title: "Service-Based Businesses", 
+        description: "Businesses that need clean monthly bookkeeping, reporting, and tax-ready financial records.",
+        image: "/SMO.jpg" 
+    },
+    { 
+        title: "Trades & Field-Service Companies", 
+        description: "Contractors and field-service businesses managing jobs, crews, vendors, equipment, payroll timing, and cash flow pressure.",
+        image: "/ESC.jpg" 
+    },
+    { 
+        title: "Inventory or Unit-Based Businesses", 
+        description: "Businesses such as auto dealers, equipment companies, and other inventory-heavy operations where costs, assets, loans, or inventory need closer tracking.",
+        image: "/SBB.jpg" 
+    },
+    { 
+        title: "Retail, Restaurant & Salon Businesses", 
+        description: "Businesses with daily sales activity, deposits, merchant fees, tips, payouts, and sales tax considerations.",
         image: "/FWVC.jpg" 
+    },
+    { 
+        title: "Businesses Across the U.S.", 
+        description: "Owners who need clearer financial visibility before making operational decisions.",
+        image: "/SMO.jpg" 
     },
 ];
 
-export default function ServicesTailored({ data }: TailoredServicesProps) {
-    const heading = data?.heading || "Our services are tailored for";
-    const services = data?.services || defaultServices;
+export default function ServicesTailored() {
+    const heading = "Built for Businesses With More Financial Moving Parts";
+    const services = defaultServices;
 
     return (
         <section className="py-20 lg:py-24 bg-white">
@@ -30,16 +40,14 @@ export default function ServicesTailored({ data }: TailoredServicesProps) {
                     {heading}
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
                     {services.map((service, index) => {
-                        const imageUrl = service.image && typeof service.image !== 'string' 
-                            ? urlFor(service.image).url() 
-                            : service.image;
+                        const imageUrl = service.image;
 
                         return (
                             <div
                                 key={index}
-                                className="relative w-full aspect-[4/5] rounded-[16px] lg:rounded-[24px] overflow-hidden group"
+                                className="relative w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-64px)/3)] aspect-[4/5] rounded-[16px] lg:rounded-[24px] overflow-hidden group"
                             >
                                 <Image 
                                     src={imageUrl} 
@@ -48,15 +56,16 @@ export default function ServicesTailored({ data }: TailoredServicesProps) {
                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                                 
-                                {/* FIXED: Restricted the gradient height. 
-                                    'to-30%' ensures the dark shadow is completely transparent before it reaches the top 30% of the image. 
-                                    'from-black/80' gives it that strong visibility punch for the text without covering the whole photo. */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent to-30% pointer-events-none z-10" />
+                                {/* Subtle bottom gradient for text readability */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none z-10" />
                                 
-                                <div className="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20">
-                                    <h3 className="text-white font-semibold text-[15px] lg:text-[17px] leading-[1.4] tracking-[0.02em] font-sans">
+                                <div className="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20 flex flex-col text-left">
+                                    <h3 className="text-white font-bold text-[17px] lg:text-[21px] leading-[1.3] font-sans">
                                         {service.title}
                                     </h3>
+                                    <p className="text-white/90 font-sans font-light text-[13px] lg:text-[14px] leading-relaxed max-h-0 opacity-0 overflow-hidden group-hover:max-h-[150px] group-hover:opacity-100 group-hover:mt-3 transition-all duration-500 ease-out">
+                                        {service.description}
+                                    </p>
                                 </div>
                             </div>
                         );

@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-// FIXED: Imported ChevronDown for the custom dropdown arrow
 import { ChevronDown } from "lucide-react"; 
 
 interface FormData {
@@ -24,12 +23,12 @@ interface FormErrors {
     help?: string | null;
 }
 
-// FIXED: Defined our dropdown options cleanly
 const helpOptions = [
-    { value: "bookkeeping", label: "Monthly Bookkeeping" },
-    { value: "tax", label: "Tax Preparation" },
-    { value: "cleanup", label: "Catch-up / Cleanup" },
-    { value: "other", label: "Other" }
+    { value: "Monthly bookkeeping and financial reporting", label: "Monthly bookkeeping and financial reporting" },
+    { value: "Cleanup or catch-up support", label: "Cleanup or catch-up support" },
+    { value: "Tax support and planning", label: "Tax support and planning" },
+    { value: "Financial Structure Review", label: "Financial Structure Review" },
+    { value: "Not sure yet", label: "Not sure yet" }
 ];
 
 export default function ContactForm() {
@@ -41,11 +40,9 @@ export default function ContactForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
     
-    // FIXED: Added state and ref for the custom dropdown
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // FIXED: Click-away listener to close the dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -64,7 +61,6 @@ export default function ContactForm() {
         }
     };
 
-    // FIXED: Custom handler for our new dropdown
     const handleSelectOption = (value: string) => {
         setFormData((prev) => ({ ...prev, help: value }));
         if (errors.help) setErrors((prev) => ({ ...prev, help: null }));
@@ -113,16 +109,52 @@ export default function ContactForm() {
             <div className="container mx-auto px-6 lg:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-16 lg:gap-20 items-start max-w-[1300px] mx-auto">
                     
-                    {/* Left Column - Image */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="relative w-full h-[500px] lg:h-[750px] rounded-[4px] overflow-hidden"
-                    >
-                        <Image src="/CU.jpg" alt="Contact Prospera" fill className="object-cover" />
-                    </motion.div>
+                    {/* Left Column - Image + Info Box */}
+                    <div className="flex flex-col gap-8">
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                            className="relative w-full h-[300px] lg:h-[350px] rounded-[12px] overflow-hidden shadow-sm"
+                        >
+                            <Image src="/CU.jpg" alt="Contact Prospera" fill className="object-cover object-top" />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="bg-white p-8 rounded-[16px] border border-black/5 text-left flex flex-col gap-6 shadow-sm"
+                        >
+                            <div>
+                                <h3 className="text-[17px] lg:text-[19px] font-serif font-normal text-[#111315] mb-4">
+                                    We are especially interested in understanding:
+                                </h3>
+                                <ul className="flex flex-col gap-3">
+                                    {[
+                                        "Whether your books are current",
+                                        "What accounting system you use",
+                                        "Whether cleanup or catch-up work is needed",
+                                        "What financial questions feel unclear",
+                                        "Whether you need monthly bookkeeping, reporting, tax-ready support, cleanup, or operational visibility support"
+                                    ].map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-2.5 text-[14px] lg:text-[15px] text-[#444] font-sans font-light leading-relaxed">
+                                            <span className="w-1.5 h-1.5 bg-[#FEACC6] rounded-full shrink-0 mt-2"></span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <hr className="border-black/5" />
+
+                            <p className="text-[14px] lg:text-[15px] text-[#555] font-sans font-light leading-relaxed">
+                                <strong>Prospera Group USA LLC</strong> is based in Greensboro, North Carolina, and supports businesses across the U.S.
+                            </p>
+                        </motion.div>
+                    </div>
 
                     {/* Right Column - Form */}
                     <motion.div
@@ -130,15 +162,15 @@ export default function ContactForm() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="flex flex-col pt-2"
+                        className="flex flex-col pt-2 text-left"
                     >
-                        <h2 className="text-[2.5rem] lg:text-[4rem] font-serif font-normal text-[#111315] leading-[1.05] mb-6">
-                            Start Your Recurring <br /> Bookkeeping Plan
+                        <h2 className="text-[2.25rem] lg:text-[3.5rem] font-serif font-normal text-[#111315] leading-[1.05] mb-6">
+                            Request a Financial <br /> Structure Review
                         </h2>
                         <p className="text-[15px] lg:text-[17px] text-[#444] font-sans font-light mb-10 max-w-lg leading-relaxed">
-                            Ready for recurring bookkeeping support? Book an intro call to confirm fit and discuss next steps.
+                            If your business needs cleaner books, clearer reporting, better tax readiness, or clearer visibility into financial decisions, Prospera can help you identify the next right step. Use this form to tell us where your business stands today and what type of support you are looking for.
                         </p>
-
+ 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Row 1 */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +185,7 @@ export default function ContactForm() {
                                     {errors.lastName && <p className="text-red-500 text-[12px] mt-1">{errors.lastName}</p>}
                                 </div>
                             </div>
-
+ 
                             {/* Row 2 */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
@@ -167,8 +199,8 @@ export default function ContactForm() {
                                     {errors.email && <p className="text-red-500 text-[12px] mt-1">{errors.email}</p>}
                                 </div>
                             </div>
-
-                            {/* Row 3 - Custom Dropdown implemented here */}
+ 
+                            {/* Row 3 */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[13px] font-sans font-bold text-[#111315]">Phone Number</label>
@@ -179,7 +211,6 @@ export default function ContactForm() {
                                 <div className="space-y-2" ref={dropdownRef}>
                                     <label className="text-[13px] font-sans font-bold text-[#111315]">How can we help?</label>
                                     
-                                    {/* FIXED: Replaced standard <select> with custom UI */}
                                     <div className="relative">
                                         <div 
                                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -188,8 +219,7 @@ export default function ContactForm() {
                                             {formData.help ? helpOptions.find(o => o.value === formData.help)?.label : "Select here"}
                                             <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                         </div>
-
-                                        {/* Dropdown Menu Animation */}
+ 
                                         <AnimatePresence>
                                             {isDropdownOpen && (
                                                 <motion.div 
@@ -215,18 +245,18 @@ export default function ContactForm() {
                                     {errors.help && <p className="text-red-500 text-[12px] mt-1">{errors.help}</p>}
                                 </div>
                             </div>
-
+ 
                             {/* Message Row */}
                             <div className="space-y-2">
                                 <label className="text-[13px] font-sans font-bold text-[#111315]">Message (Optional)</label>
                                 <textarea name="message" value={formData.message} onChange={handleChange} rows={4} placeholder="Type here" className="w-full bg-white border border-transparent rounded-[8px] px-5 py-4 text-[14px] font-sans focus:ring-1 focus:ring-[#FEACC6] outline-none resize-none shadow-sm"></textarea>
                             </div>
-
-                            <button type="submit" disabled={isSubmitting} className={`${isSubmitting ? 'bg-[#fca1be] cursor-not-allowed' : 'bg-[#FEACC6] hover:bg-[#fca1be]'} text-[#111315] px-10 py-4 font-sans font-bold text-[13px] tracking-[0.1em] rounded-[8px] transition-colors uppercase mt-2 inline-block`}>
-                                {isSubmitting ? "SENDING..." : "BOOK AN INTRO CALL"}
+ 
+                            <button type="submit" disabled={isSubmitting} className={`${isSubmitting ? 'bg-[#fca1be] cursor-not-allowed' : 'bg-[#FEACC6] hover:bg-[#fca1be]'} text-[#111315] w-full sm:w-auto px-8 py-4 font-sans font-bold text-[13px] tracking-[0.1em] rounded-[8px] transition-colors uppercase mt-2 inline-block text-center`}>
+                                {isSubmitting ? "SENDING..." : "Schedule a Financial Structure Review"}
                             </button>
-
-                            {submitStatus === 'success' && <p className="text-green-600 text-[14px] font-sans font-bold mt-4">Thank you! Your intro call request has been sent.</p>}
+ 
+                            {submitStatus === 'success' && <p className="text-green-600 text-[14px] font-sans font-bold mt-4">Thank you! Your request has been sent.</p>}
                             {submitStatus === 'error' && <p className="text-red-500 text-[14px] font-sans font-bold mt-4">Something went wrong. Please try again or email us directly.</p>}
 
                         </form>

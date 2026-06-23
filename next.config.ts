@@ -10,14 +10,6 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
       },
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-      },
-      {
-        protocol: 'https',
-        hostname: 'randomuser.me',
-      },
     ],
   },
 };
