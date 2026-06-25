@@ -64,11 +64,11 @@ export default function WhyDifferent() {
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                             
-                            <div className="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20 flex flex-col text-left">
+                            <div className="absolute bottom-0 left-0 w-full px-8 pt-6 pb-10 lg:p-8 z-20 flex flex-col gap-2.5 lg:gap-0 text-left">
                                 <h3 className="text-white font-bold text-[17px] lg:text-[21px] leading-[1.3] font-sans">
                                     {item.title}
                                 </h3>
-                                <p className="text-white/90 font-sans font-light text-[13px] lg:text-[14px] leading-relaxed max-h-0 opacity-0 overflow-hidden group-hover:max-h-[150px] group-hover:opacity-100 group-hover:mt-3 transition-all duration-500 ease-out">
+                                <p className="text-white/90 font-sans font-light text-[13px] lg:text-[14px] leading-relaxed opacity-100 max-h-[150px] lg:max-h-0 lg:opacity-0 lg:overflow-hidden lg:group-hover:max-h-[150px] lg:group-hover:opacity-100 lg:group-hover:mt-3 lg:transition-all lg:duration-500 lg:ease-out">
                                     {item.description}
                                 </p>
                             </div>

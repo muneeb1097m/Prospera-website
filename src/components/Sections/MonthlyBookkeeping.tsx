@@ -26,7 +26,7 @@ export default function MonthlyBookkeeping() {
                         Monthly & Tax-Ready Foundation
                     </motion.h2>
                     <p className="text-[16px] lg:text-[18px] text-[#555] font-sans font-light max-w-2xl mx-auto">
-                        Clean books are the foundation of your business's financial clarity. We keep your accounts structured, reconciled, and ready for tax season.
+                        Clean books are the foundation of your business&apos;s financial clarity. We keep your accounts structured, reconciled, and ready for tax season.
                     </p>
                 </div>
 

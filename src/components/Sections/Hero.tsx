@@ -16,7 +16,7 @@ export default function Hero() {
             <div className="container mx-auto px-6 lg:px-12 relative z-10 w-full flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8">
                 
                 {/* Left Column - Content (Increased width for headline space) */}
-                <div className="w-full lg:w-[58%] xl:w-[60%]">
+                <div className="w-full lg:w-[58%] xl:w-[60%] pt-16 lg:pt-0">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -25,11 +25,11 @@ export default function Hero() {
                     >
                         {/* Responsive font sizing and whitespace wrapping to prevent overlap */}
                         <h1 className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[2.75rem] xl:text-[3.5rem] font-serif font-normal leading-[1.2] tracking-tight text-white mb-8">
-                            <span className="block xl:whitespace-nowrap">
+                            <span className="block sm:whitespace-nowrap">
                                 {line1Prefix}
                                 <span className="italic text-[#FEACC6] font-bold">{line1Emphasis}</span>
                             </span>
-                            <span className="block xl:whitespace-nowrap mt-2 md:mt-4">
+                            <span className="block sm:whitespace-nowrap mt-2 md:mt-4">
                                 {line2}
                             </span>
                         </h1>

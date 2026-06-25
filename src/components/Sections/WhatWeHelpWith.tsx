@@ -87,7 +87,7 @@ export default function WhatWeHelpWith() {
                     >
                         <div className="flex flex-col h-full">
                             {services.map((service, index) => {
-                                const IconComponent = (LucideIcons as any)[service.iconName] || LucideIcons.HelpCircle;
+                                const IconComponent = (LucideIcons[service.iconName as keyof typeof LucideIcons] || LucideIcons.HelpCircle) as React.ComponentType<{ className?: string }>;
                                 return (
                                     <div
                                         key={index}

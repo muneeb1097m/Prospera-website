@@ -5,7 +5,7 @@ import Image from "next/image"; // Added missing Image import
 export default function HowItWorksHero() {
     return (
         /* FIXED: Background updated to your core brand dark slate #111315 */
-        <section className="relative bg-[#111315] text-white pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden text-center">
+        <section className="relative bg-[#111315] text-white pt-28 pb-12 lg:pt-32 lg:pb-16 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
