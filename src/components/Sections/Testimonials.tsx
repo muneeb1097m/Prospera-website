@@ -1,8 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
+import { TestimonialsContent } from "@/lib/content/defaults";
 
-const testimonials = [
+const defaultTestimonials = [
     {
         quote: "Working with Jenna has been an absolute game changer for my business. Following her bookkeeping and accounting processes has saved me a tremendous amount of time and money. She has a clear, organized system that makes everything so much easier and more efficient.",
         author: "Sami Maaliki",
@@ -45,7 +46,11 @@ const testimonials = [
     },
 ];
 
-export default function Testimonials() {
+export default function Testimonials({ content }: { content?: Partial<TestimonialsContent> } = {}) {
+    const bannerPrefix = content?.bannerPrefix ?? "WE BELIEVE BOOKKEEPING SHOULD FEEL:";
+    const bannerHighlight = content?.bannerHighlight ?? "Structured. Transparent. Predictable. Reliable.";
+    const items = content?.testimonials ?? defaultTestimonials;
+
     return (
         <section className="bg-[#FAF7F2] pb-20 overflow-hidden">
             {/* Static Pink Banner */}
@@ -53,8 +58,8 @@ export default function Testimonials() {
                 <div className="flex items-center gap-4 text-[13px] font-sans uppercase tracking-widest text-[#111315] text-center">
                     <CheckCircle2 className="w-5 h-5 shrink-0" />
                     <span className="whitespace-normal sm:whitespace-nowrap">
-                        <span className="font-black">WE BELIEVE BOOKKEEPING SHOULD FEEL:</span>{" "}
-                        <span className="font-semibold">Structured. Transparent. Predictable. Reliable.</span>
+                        <span className="font-black">{bannerPrefix}</span>{" "}
+                        <span className="font-semibold">{bannerHighlight}</span>
                     </span>
                 </div>
             </div>
@@ -75,7 +80,7 @@ export default function Testimonials() {
 
                 {/* Testimonial Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-                    {testimonials.map((t, i) => (
+                    {items.map((t, i) => (
                         <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 30 }}
@@ -90,7 +95,7 @@ export default function Testimonials() {
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-lg bg-[#FEACC6]/20 flex items-center justify-center shrink-0 border border-[#FEACC6]/40">
                                     <span className="text-[#111315] font-sans font-bold text-[14px]">
-                                        {t.author.split(' ').map((n) => n[0]).join('')}
+                                        {(t.author && t.author.trim()) ? t.author.trim().split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'P'}
                                     </span>
                                 </div>
                                 <div>

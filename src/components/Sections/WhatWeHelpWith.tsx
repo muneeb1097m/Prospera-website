@@ -2,40 +2,43 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import * as LucideIcons from "lucide-react";
+import { WhatWeHelpWithContent } from "@/lib/content/defaults";
 
-export default function WhatWeHelpWith() {
-    const heading = "What Prospera Helps You Gain";
-    const tagline = "THE PROSPERA ADVANTAGE";
-    const description1 = "Unlike standalone bookkeepers, our structured monthly system is designed with tax preparation in mind.";
-    const description2 = "Because we understand both financial organization and tax compliance, your records are structured properly throughout the year—not just at filing time.";
+const defaultIcons = ["CalendarDays", "FileBarChart", "Calculator", "Users", "Headset"];
+
+export default function WhatWeHelpWith({ content }: { content?: Partial<WhatWeHelpWithContent> } = {}) {
+    const heading = content?.heading ?? "What Prospera Helps You Gain";
+    const tagline = content?.tagline ?? "THE PROSPERA ADVANTAGE";
+    const description1 = content?.description1 ?? "Unlike standalone bookkeepers, our structured monthly system is designed with tax preparation in mind.";
+    const description2 = content?.description2 ?? "Because we understand both financial organization and tax compliance, your records are structured properly throughout the year—not just at filing time.";
     
-    const services = [
+    const rawServices = content?.services ?? [
         {
             title: "Monthly Bookkeeping & Reconciliation",
             description: "Transactions, bank accounts, and credit cards are organized and reconciled consistently.",
-            iconName: "CalendarDays",
         },
         {
             title: "Financial Reporting & Visibility",
             description: "Monthly reports help you understand revenue, expenses, profitability, and cash flow.",
-            iconName: "FileBarChart",
         },
         {
             title: "Tax-Ready Bookkeeping Support",
             description: "Your records are maintained throughout the year with tax preparation and compliance in mind.",
-            iconName: "Calculator",
         },
         {
             title: "Cleanup & Catch-Up Support",
             description: "If your books are behind, messy, or unclear, we help define what needs to be corrected before ongoing support begins.",
-            iconName: "Users",
         },
         {
             title: "Financial Visibility for Operational Decisions",
             description: "We help business owners use their financial information to make more informed decisions around payroll, pricing, hiring, taxes, and growth.",
-            iconName: "Headset",
         },
     ];
+
+    const services = rawServices.map((s, idx) => ({
+        ...s,
+        iconName: defaultIcons[idx % defaultIcons.length],
+    }));
 
     return (
         <section className="bg-[#FAF6F3] py-16 lg:py-24 relative overflow-hidden">

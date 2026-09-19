@@ -1,29 +1,34 @@
 "use client";
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
+import { HowItWorksContent } from "@/lib/content/defaults";
 
-export default function HowItWorks() {
-    const heading = "How It Works";
-    const noteTitle = "Note";
-    const noteText = "Recurring services begin after onboarding. Historical cleanup or \"catch-up\" work for past months is assessed and quoted separately.";
+const defaultIcons = ["Phone", "Monitor", "Headset"];
+
+export default function HowItWorks({ content }: { content?: Partial<HowItWorksContent> } = {}) {
+    const heading = content?.heading ?? "How It Works";
+    const noteTitle = content?.noteTitle ?? "Note";
+    const noteText = content?.noteText ?? "Recurring services begin after onboarding. Historical cleanup or \"catch-up\" work for past months is assessed and quoted separately.";
     
-    const steps = [
+    const rawSteps = content?.steps ?? [
         {
             title: "Financial Structure Review",
             description: "A comprehensive diagnostic review to identify structural gaps in your books.",
-            iconName: "Phone",
         },
         {
             title: "Structured Onboarding",
             description: "Secure tool connection, account cleanup, and clean structure alignment.",
-            iconName: "Monitor",
         },
         {
             title: "Practical Support",
             description: "Consistent monthly reconciliation, clean reports, and tax-ready structure.",
-            iconName: "Headset",
         },
     ];
+
+    const steps = rawSteps.map((s, idx) => ({
+        ...s,
+        iconName: defaultIcons[idx % defaultIcons.length],
+    }));
 
     return (
         <section className="bg-[#3B4451] pt-16 lg:pt-20 pb-16 lg:pb-24 text-white overflow-hidden">

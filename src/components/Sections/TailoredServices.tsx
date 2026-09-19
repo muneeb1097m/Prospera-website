@@ -1,4 +1,7 @@
 import Image from "next/image";
+import { TailoredServicesContent } from "@/lib/content/defaults";
+
+const defaultImages = ["/SMO.jpg", "/ESC.jpg", "/SBB.jpg", "/FWVC.jpg", "/SMO.jpg"];
 
 const defaultServices = [
     { 
@@ -28,9 +31,12 @@ const defaultServices = [
     },
 ];
 
-export default function ServicesTailored() {
-    const heading = "Built for Businesses With More Financial Moving Parts";
-    const services = defaultServices;
+export default function ServicesTailored({ content }: { content?: Partial<TailoredServicesContent> } = {}) {
+    const heading = content?.heading ?? "Built for Businesses With More Financial Moving Parts";
+    const services = (content?.services ?? defaultServices).map((s, idx) => ({
+        ...s,
+        image: (s as { image?: string }).image || defaultImages[idx % defaultImages.length],
+    }));
 
     return (
         <section className="py-20 lg:py-24 bg-white">

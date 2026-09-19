@@ -2,8 +2,15 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ContactInfoContent } from "@/lib/content/defaults";
 
-export default function Footer() {
+export default function Footer({ content }: { content?: Partial<ContactInfoContent> } = {}) {
+    const email = content?.email ?? "admin@prosperagroup.us";
+    const phone = content?.phone ?? "+1 (336) 860-7529";
+    const address = content?.address ?? "3300 Battleground Ave Suite 310 Greensboro, NC 27410";
+    const tagline = content?.tagline ?? "Prospera Group USA LLC helps growing businesses gain cleaner bookkeeping, clearer financial reporting, tax-ready organization, and better financial visibility for decision-making.";
+    const subtext = content?.subtext ?? "Based in Greensboro, North Carolina. Supporting businesses across the U.S.";
+
     return (
         <footer className="bg-[#FAF7F2] pt-16 pb-8 text-[#111315]">
             <div className="container mx-auto px-6 lg:px-12 max-w-[1400px]">
@@ -22,10 +29,10 @@ export default function Footer() {
                             />
                         </div>
                         <p className="text-[15px] leading-relaxed text-[#444] max-w-sm font-sans font-light">
-                            Prospera Group USA LLC helps growing businesses gain cleaner bookkeeping, clearer financial reporting, tax-ready organization, and better financial visibility for decision-making.
+                            {tagline}
                         </p>
                         <p className="text-[14px] leading-relaxed text-[#666] max-w-sm font-sans font-light mt-2">
-                            Based in Greensboro, North Carolina. Supporting businesses across the U.S.
+                            {subtext}
                         </p>
                     </div>
 
@@ -49,15 +56,15 @@ export default function Footer() {
                         <ul className="flex flex-col gap-5 text-[15px] font-sans font-light text-[#444]">
                             <li className="flex items-center gap-3">
                                 <Mail size={18} className="text-[#111315]" />
-                                <a href="mailto:admin@prosperagroup.us" className="hover:text-[#FEACC6] transition-colors">admin@prosperagroup.us</a>
+                                <a href={`mailto:${email}`} className="hover:text-[#FEACC6] transition-colors">{email}</a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={18} className="text-[#111315]" />
-                                <a href="tel:+13368607529" className="hover:text-[#FEACC6] transition-colors">+1 (336) 860-7529</a>
+                                <a href={`tel:${phone.replace(/\D/g, '')}`} className="hover:text-[#FEACC6] transition-colors">{phone}</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin size={18} className="text-[#111315] shrink-0 mt-[2px]" />
-                                <span className="leading-relaxed">3300 Battleground Ave Suite 310 Greensboro, NC 27410</span>
+                                <span className="leading-relaxed">{address}</span>
                             </li>
                         </ul>
                     </div>

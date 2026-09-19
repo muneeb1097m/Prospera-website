@@ -1,9 +1,29 @@
 "use client";
 import { motion } from "framer-motion";
+import { StatsContent } from "@/lib/content/defaults";
 
-export default function Stats() {
-    const heading = "Monthly Financial Clarity & Bookkeeping Support";
-    const subtext = "Accurate bookkeeping, clear financial reporting, and tax-ready organization that help growing businesses understand their numbers and maintain control.";
+export default function Stats({ content }: { content?: Partial<StatsContent> } = {}) {
+    const heading = content?.heading ?? "Monthly Financial Clarity & Bookkeeping Support";
+    const subtext = content?.subtext ?? "Accurate bookkeeping, clear financial reporting, and tax-ready organization that help growing businesses understand their numbers and maintain control.";
+    const whyTrustTitle = content?.whyTrustTitle ?? "Why Business Owners Trust Prospera";
+    const trustPoints = content?.trustPoints ?? [
+        { 
+            title: "Better Financial Visibility", 
+            desc: "You can see what is happening before payroll, taxes, or cash flow problems become stressful." 
+        },
+        { 
+            title: "Tax-Ready Organization", 
+            desc: "Your records are maintained throughout the year with tax season in mind." 
+        },
+        { 
+            title: "Clearer Reporting", 
+            desc: "Your financial reports are easier to understand and use." 
+        },
+        { 
+            title: "Cleaner Records", 
+            desc: "Your books are organized, reconciled, and maintained consistently." 
+        }
+    ];
 
     return (
         <section className="relative flex flex-col lg:flex-row min-h-[450px]">
@@ -42,29 +62,12 @@ export default function Stats() {
                         transition={{ duration: 0.6 }}
                         className="text-white font-serif text-2xl lg:text-3xl mb-4 border-b border-white/10 pb-6"
                     >
-                        Why Business Owners Trust Prospera
+                        {whyTrustTitle}
                     </motion.h3>
 
                     {/* Trust Blocks */}
                     <div className="space-y-8">
-                        {[
-                            { 
-                                title: "Better Financial Visibility", 
-                                desc: "You can see what is happening before payroll, taxes, or cash flow problems become stressful." 
-                            },
-                            { 
-                                title: "Tax-Ready Organization", 
-                                desc: "Your records are maintained throughout the year with tax season in mind." 
-                            },
-                            { 
-                                title: "Clearer Reporting", 
-                                desc: "Your financial reports are easier to understand and use." 
-                            },
-                            { 
-                                title: "Cleaner Records", 
-                                desc: "Your books are organized, reconciled, and maintained consistently." 
-                            }
-                        ].map((item, index) => (
+                        {trustPoints.map((item, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}

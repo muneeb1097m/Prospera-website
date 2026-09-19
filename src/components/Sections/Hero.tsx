@@ -2,13 +2,17 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { HeroContent } from "@/lib/content/defaults";
 
-export default function Hero() {
-    const line1Prefix = "Your Revenue ";
-    const line1Emphasis = "Is Growing.";
-    const line2 = "Your Numbers Should Keep Up.";
+export default function Hero({ content }: { content?: Partial<HeroContent> } = {}) {
+    const line1Prefix = content?.line1Prefix ?? "Your Revenue ";
+    const line1Emphasis = content?.line1Emphasis ?? "Is Growing.";
+    const line2 = content?.line2 ?? "Your Numbers Should Keep Up.";
     
-    const subtitle = "When your books are done but your reports still do not make sense, financial decisions get harder than they should be. Prospera helps build the clarity and organization that changes that. No more guesswork.";
+    const subtitle = content?.subtitle ?? "When your books are done but your reports still do not make sense, financial decisions get harder than they should be. Prospera helps build the clarity and organization that changes that. No more guesswork.";
+    const ctaPrimaryText = content?.ctaPrimaryText ?? "Schedule a Financial Structure Review";
+    const ctaSecondaryText = content?.ctaSecondaryText ?? "See How the Process Works";
+    const trustText = content?.trustText ?? "Based in Greensboro, North Carolina, Prospera supports businesses across the U.S. that need cleaner bookkeeping, clearer financial reporting, and stronger tax-ready organization throughout the year.";
     const imageUrl = "/hero1.jpg";
 
     return (
@@ -40,16 +44,16 @@ export default function Hero() {
 
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                             <Link href="/contact" className="w-full sm:w-auto bg-[#FEACC6] hover:bg-[#fca1be] text-[#111315] px-6 lg:px-8 py-4 font-sans font-bold text-[13px] tracking-[0.1em] rounded-[8px] transition-colors uppercase text-center">
-                                Schedule a Financial Structure Review
+                                {ctaPrimaryText}
                             </Link>
                             <Link href="/how-it-works" className="w-full sm:w-auto border border-white hover:bg-white/10 text-white px-6 lg:px-8 py-4 font-sans font-bold text-[13px] tracking-[0.1em] rounded-[8px] transition-colors uppercase text-center">
-                                See How the Process Works
+                                {ctaSecondaryText}
                             </Link>
                         </div>
 
                         {/* Local / Trust Line */}
                         <p className="mt-8 text-[13px] text-white/50 font-sans font-light max-w-[500px] leading-relaxed">
-                            Based in Greensboro, North Carolina, Prospera supports businesses across the U.S. that need cleaner bookkeeping, clearer financial reporting, and stronger tax-ready organization throughout the year.
+                            {trustText}
                         </p>
                     </motion.div>
                 </div>
