@@ -41,12 +41,24 @@ interface SectionItem {
 }
 
 interface SectionGroup {
+  key: string;
   group: string;
   items: SectionItem[];
 }
 
+const PAGE_FILTERS = [
+  { id: 'all', label: 'All Pages', icon: Layers, count: 26 },
+  { id: 'home', label: 'Homepage', icon: Layout, count: 7 },
+  { id: 'about', label: 'About Page', icon: FileText, count: 5 },
+  { id: 'services', label: 'Services Page', icon: Briefcase, count: 7 },
+  { id: 'how-it-works', label: 'How It Works', icon: CheckSquare, count: 3 },
+  { id: 'contact', label: 'Contact Page', icon: HelpCircle, count: 3 },
+  { id: 'global', label: 'Site-Wide', icon: PhoneCall, count: 1 },
+];
+
 const SECTIONS: SectionGroup[] = [
   {
+    key: 'home',
     group: 'Homepage Content',
     items: [
       { id: 'home_hero', label: 'Hero Header', icon: Layout, desc: 'Headlines, intro text, and CTA buttons' },
@@ -59,6 +71,7 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    key: 'about',
     group: 'About Page',
     items: [
       { id: 'about_hero', label: 'About Hero', icon: Layout, desc: 'Header badge and main headline' },
@@ -69,6 +82,7 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    key: 'services',
     group: 'Services Page',
     items: [
       { id: 'services_hero', label: 'Services Hero', icon: Layout, desc: 'Headline, badge, and intro copy' },
@@ -81,6 +95,7 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    key: 'how-it-works',
     group: 'How It Works Page',
     items: [
       { id: 'how_it_works_hero', label: 'Process Hero', icon: Layout, desc: 'Page headline and intro paragraph' },
@@ -89,6 +104,7 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    key: 'contact',
     group: 'Contact Page',
     items: [
       { id: 'contact_hero', label: 'Contact Hero', icon: Layout, desc: 'Contact page title and badge' },
@@ -97,6 +113,7 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    key: 'global',
     group: 'Site-wide Settings',
     items: [
       { id: 'contact_info', label: 'Company & Footer', icon: PhoneCall, desc: 'Global email, phone, address, and footer copy' },
@@ -106,6 +123,7 @@ const SECTIONS: SectionGroup[] = [
 
 export default function ContentDashboardClient({ initialContent }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('home_hero');
+  const [selectedPageFilter, setSelectedPageFilter] = useState<string>('all');
   const [content, setContent] = useState<SiteContentState>(initialContent);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -113,6 +131,19 @@ export default function ContentDashboardClient({ initialContent }: Props) {
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSelectPageFilter = (filterId: string) => {
+    setSelectedPageFilter(filterId);
+    if (filterId !== 'all') {
+      const targetGroup = SECTIONS.find((g) => g.key === filterId);
+      if (targetGroup && targetGroup.items.length > 0) {
+        const isCurrentInTarget = targetGroup.items.some((item) => item.id === activeTab);
+        if (!isCurrentInTarget) {
+          setActiveTab(targetGroup.items[0].id);
+        }
+      }
+    }
   };
 
   const handleSaveActiveSection = async () => {
@@ -156,8 +187,13 @@ export default function ContentDashboardClient({ initialContent }: Props) {
     }
   }
 
+  // Filtered section groups for sidebar navigation
+  const visibleGroups = selectedPageFilter === 'all'
+    ? SECTIONS
+    : SECTIONS.filter((g) => g.key === selectedPageFilter);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Toast Notification */}
       {toast && (
         <div
@@ -212,12 +248,60 @@ export default function ContentDashboardClient({ initialContent }: Props) {
         </div>
       </div>
 
+      {/* Horizontal Page Filters Bar */}
+      <div className="bg-white border border-gray-200/70 rounded-2xl p-2.5 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-2 px-2 pt-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            Filter Sections By Page
+          </span>
+          {selectedPageFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => handleSelectPageFilter('all')}
+              className="text-[11px] font-medium text-gray-500 hover:text-black underline cursor-pointer"
+            >
+              Reset to All ({PAGE_FILTERS[0].count} sections)
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+          {PAGE_FILTERS.map((filter) => {
+            const Icon = filter.icon;
+            const isSelected = selectedPageFilter === filter.id;
+            return (
+              <button
+                key={filter.id}
+                type="button"
+                onClick={() => handleSelectPageFilter(filter.id)}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium shrink-0 transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#111315] text-white shadow-sm'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200/60'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#FEACC6]' : 'text-gray-400'}`} />
+                <span>{filter.label}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                    isSelected
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-200/70 text-gray-600'
+                  }`}
+                >
+                  {filter.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Grid: Sidebar + Editor */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Navigation Sidebar (4 cols) */}
         <aside className="lg:col-span-4 bg-white rounded-2xl border border-gray-200/70 p-4 md:p-5 shadow-xs space-y-6">
-          {SECTIONS.map((group, gIdx) => (
+          {visibleGroups.map((group, gIdx) => (
             <div key={gIdx} className="space-y-1.5">
               <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">
                 {group.group}
