@@ -1,10 +1,18 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image"; // Added missing Image import
+import Image from "next/image";
+import { ContactHeroContent } from "@/lib/content/defaults";
 
-export default function ContactHero() {
+interface ContactHeroProps {
+    content?: ContactHeroContent;
+}
+
+export default function ContactHero({ content }: ContactHeroProps) {
+    const badge = content?.badge || "CONTACT PROSPERA";
+    const line1 = content?.line1 || "Request a Financial";
+    const line2 = content?.line2 || "Structure Review";
+
     return (
-        /* FIXED: Background updated to your core brand dark slate #111315 */
         <section className="relative bg-[#111315] text-white pt-28 pb-12 lg:pt-32 lg:pb-16 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
@@ -13,19 +21,16 @@ export default function ContactHero() {
                     transition={{ duration: 0.8 }}
                     className="flex flex-col items-center"
                 >
-                    {/* FIXED BADGE: Swapped rounded-full for rounded-[8px] to match the navbar button */}
                     <div className="bg-[#FEACC6] text-[#111315] px-6 py-2.5 rounded-[8px] text-[13px] font-sans font-bold uppercase tracking-[0.1em] mb-10 inline-block">
-                        CONTACT PROSPERA
+                        {badge}
                     </div>
                     
-                    {/* FIXED HEADING: Changed font-medium to font-normal for that premium, elegant serif look */}
                     <h1 className="text-[2.5rem] lg:text-[5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
-                        Request a Financial <br /> Structure Review
+                        {line1} {line2 ? <><br />{line2}</> : null}
                     </h1>
                 </motion.div>
             </div>
 
-            {/* FIXED DECORATION: Added the missing whitelogo.png anchored to the bottom right */}
             <div className="absolute -bottom-10 -right-10 w-[300px] lg:w-[600px] h-[300px] lg:h-[600px] opacity-[0.06] pointer-events-none">
                 <Image
                     src="/whitelogo.png"

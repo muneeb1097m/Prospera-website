@@ -4,6 +4,7 @@ import FinalCTA from "@/components/Sections/FinalCTA";
 import HowItWorksHero from "@/components/Sections/HowItWorksHero";
 import HowItWorksSteps from "@/components/Sections/HowItWorksSteps";
 import { Metadata } from "next";
+import { getAllSiteContent } from "@/lib/content/getContent";
 
 export const metadata: Metadata = {
     title: "How Our Financial Structure Review Works | Prospera Group",
@@ -13,18 +14,20 @@ export const metadata: Metadata = {
     },
 };
 
-export default function HowItWorksPage() {
+export default async function HowItWorksPage() {
+    const content = await getAllSiteContent();
+
     return (
         <main className="min-h-screen">
             <Navbar />
-            <HowItWorksHero />
-            <HowItWorksSteps />
+            <HowItWorksHero content={content.how_it_works_hero} />
+            <HowItWorksSteps content={content.how_it_works_steps} />
             <FinalCTA 
-                headline="Start With a Clearer Picture of Where Your Business Stands"
-                body="If your business needs cleaner records, stronger reporting, tax-ready organization, or cleanup before monthly support begins, start with a Financial Structure Review."
-                buttonText="Schedule a Financial Structure Review"
+                headline={content.how_it_works_final_cta?.headline || "Start With a Clearer Picture of Where Your Business Stands"}
+                body={content.how_it_works_final_cta?.body || "If your business needs cleaner records, stronger reporting, tax-ready organization, or cleanup before monthly support begins, start with a Financial Structure Review."}
+                buttonText={content.how_it_works_final_cta?.buttonText || "Schedule a Financial Structure Review"}
             />
-            <Footer />
+            <Footer content={content.contact_info} />
         </main>
     );
 }

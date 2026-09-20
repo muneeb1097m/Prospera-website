@@ -31,7 +31,13 @@ const helpOptions = [
     { value: "Not sure yet", label: "Not sure yet" }
 ];
 
-export default function ContactForm() {
+import { ContactFormInfoContent } from "@/lib/content/defaults";
+
+interface ContactFormProps {
+    content?: ContactFormInfoContent;
+}
+
+export default function ContactForm({ content }: ContactFormProps) {
     const [formData, setFormData] = useState<FormData>({
         firstName: "", lastName: "", company: "", email: "", phone: "", help: "", message: ""
     });
@@ -130,16 +136,16 @@ export default function ContactForm() {
                         >
                             <div>
                                 <h3 className="text-[17px] lg:text-[19px] font-serif font-normal text-[#111315] mb-4">
-                                    We are especially interested in understanding:
+                                    {content?.infoBoxTitle || "We are especially interested in understanding:"}
                                 </h3>
                                 <ul className="flex flex-col gap-3">
-                                    {[
+                                    {(content?.infoBoxBullets && content.infoBoxBullets.length > 0 ? content.infoBoxBullets : [
                                         "Whether your books are current",
                                         "What accounting system you use",
                                         "Whether cleanup or catch-up work is needed",
                                         "What financial questions feel unclear",
                                         "Whether you need monthly bookkeeping, reporting, tax-ready support, cleanup, or operational visibility support"
-                                    ].map((item, idx) => (
+                                    ]).map((item, idx) => (
                                         <li key={idx} className="flex items-start gap-2.5 text-[14px] lg:text-[15px] text-[#444] font-sans font-light leading-relaxed">
                                             <span className="w-1.5 h-1.5 bg-[#FEACC6] rounded-full shrink-0 mt-2"></span>
                                             <span>{item}</span>
@@ -151,7 +157,7 @@ export default function ContactForm() {
                             <hr className="border-black/5" />
 
                             <p className="text-[14px] lg:text-[15px] text-[#555] font-sans font-light leading-relaxed">
-                                <strong>Prospera Group USA LLC</strong> is based in Greensboro, North Carolina, and supports businesses across the U.S.
+                                {content?.companyNote || <><strong>Prospera Group USA LLC</strong> is based in Greensboro, North Carolina, and supports businesses across the U.S.</>}
                             </p>
                         </motion.div>
                     </div>
@@ -165,10 +171,10 @@ export default function ContactForm() {
                         className="flex flex-col pt-2 text-left"
                     >
                         <h2 className="text-[2.25rem] lg:text-[3.5rem] font-serif font-normal text-[#111315] leading-[1.05] mb-6">
-                            Request a Financial <br /> Structure Review
+                            {content?.headingLine1 || "Request a Financial"} {content?.headingLine2 ? <><br />{content.headingLine2}</> : <><br />Structure Review</>}
                         </h2>
                         <p className="text-[15px] lg:text-[17px] text-[#444] font-sans font-light mb-10 max-w-lg leading-relaxed">
-                            If your business needs cleaner books, clearer reporting, better tax readiness, or clearer visibility into financial decisions, Prospera can help you identify the next right step. Use this form to tell us where your business stands today and what type of support you are looking for.
+                            {content?.description || "If your business needs cleaner books, clearer reporting, better tax readiness, or clearer visibility into financial decisions, Prospera can help you identify the next right step. Use this form to tell us where your business stands today and what type of support you are looking for."}
                         </p>
  
                         <form onSubmit={handleSubmit} className="space-y-6">

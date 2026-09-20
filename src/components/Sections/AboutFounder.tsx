@@ -3,8 +3,23 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Award } from "lucide-react";
+import { AboutFounderContent } from "@/lib/content/defaults";
 
-export default function AboutFounder() {
+interface AboutFounderProps {
+    content?: AboutFounderContent;
+}
+
+export default function AboutFounder({ content }: AboutFounderProps) {
+    const badge = content?.badge || "IRS Enrolled Agent";
+    const heading = content?.heading || "IRS Enrolled Agent-Led Support";
+    const paragraphs = content?.paragraphs || [
+        "Prospera is led by an IRS Enrolled Agent, a federally authorized tax professional. Prospera’s Enrolled Agent can represent taxpayers before the IRS in federal tax matters, including audits, collection matters, and appeals. Representation before state tax agencies may also be available where permitted and properly authorized.",
+        "That matters because financial records should not only be organized. They should also be maintained with tax readiness in mind throughout the year.",
+        "That perspective helps Prospera support business owners with cleaner books, clearer reporting, tax-ready records, and practical financial organization before tax deadlines or major decisions create pressure.",
+        "As businesses grow, we also help identify when financial processes, reporting structure, payroll handling, or tax-related obligations may need to evolve alongside the business.",
+    ];
+    const ctaText = content?.ctaText || "Schedule a Financial Structure Review";
+
     return (
         <section className="bg-[#FAF7F2] py-20 lg:py-32 relative overflow-hidden">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -38,30 +53,21 @@ export default function AboutFounder() {
                         {/* Credential Badge */}
                         <div className="flex items-center gap-2 bg-[#FEACC6]/25 border border-[#FEACC6]/50 text-[#111315] px-4 py-1.5 rounded-[8px] text-[12px] font-sans font-bold uppercase tracking-[0.1em] mb-6">
                             <Award className="w-4 h-4 text-[#111315]" />
-                            IRS Enrolled Agent
+                            {badge}
                         </div>
 
                         <h2 className="text-[2.25rem] lg:text-[3.5rem] font-serif font-normal text-[#111315] leading-[1.1] tracking-tight mb-8">
-                            IRS Enrolled Agent-Led Support
+                            {heading}
                         </h2>
                         
                         <div className="space-y-6 text-[#111315] font-sans font-light text-[15px] lg:text-[16px] leading-relaxed mb-10 max-w-[550px]">
-                            <p>
-                                Prospera is led by an IRS Enrolled Agent, a federally authorized tax professional. Prospera’s Enrolled Agent can represent taxpayers before the IRS in federal tax matters, including audits, collection matters, and appeals. Representation before state tax agencies may also be available where permitted and properly authorized.
-                            </p>
-                            <p>
-                                That matters because financial records should not only be organized. They should also be maintained with tax readiness in mind throughout the year.
-                            </p>
-                            <p>
-                                That perspective helps Prospera support business owners with cleaner books, clearer reporting, tax-ready records, and practical financial organization before tax deadlines or major decisions create pressure.
-                            </p>
-                            <p>
-                                As businesses grow, we also help identify when financial processes, reporting structure, payroll handling, or tax-related obligations may need to evolve alongside the business.
-                            </p>
+                            {paragraphs.map((p, idx) => (
+                                <p key={idx}>{p}</p>
+                            ))}
                         </div>
                         
                         <Link href="/contact" className="bg-[#111315] hover:bg-black text-[#FEACC6] px-10 py-4 font-sans font-bold text-[13px] tracking-[0.1em] rounded-[8px] transition-colors uppercase inline-block text-center shadow-md">
-                            Schedule a Financial Structure Review
+                            {ctaText}
                         </Link>
                     </motion.div>
                 </div>

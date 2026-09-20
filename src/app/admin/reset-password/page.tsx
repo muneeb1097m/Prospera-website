@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Lock, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Lock, CheckCircle2, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { resetPasswordAction } from '../actions';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,15 +108,27 @@ export default function ResetPasswordPage() {
                   New Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 6 characters"
-                    className="w-full bg-[#FAF7F2] border border-[#E8E4DF] rounded-xl pl-10 pr-4 py-3 text-sm text-[#111315] placeholder-gray-400 focus:outline-none focus:border-[#111315] transition-colors"
+                    className="w-full bg-[#FAF7F2] border border-[#E8E4DF] rounded-xl pl-10 pr-11 py-3 text-sm text-[#111315] placeholder-gray-400 focus:outline-none focus:border-[#111315] transition-colors"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#111315] transition-colors cursor-pointer rounded-md focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -123,15 +137,27 @@ export default function ResetPasswordPage() {
                   Confirm New Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter password"
-                    className="w-full bg-[#FAF7F2] border border-[#E8E4DF] rounded-xl pl-10 pr-4 py-3 text-sm text-[#111315] placeholder-gray-400 focus:outline-none focus:border-[#111315] transition-colors"
+                    className="w-full bg-[#FAF7F2] border border-[#E8E4DF] rounded-xl pl-10 pr-11 py-3 text-sm text-[#111315] placeholder-gray-400 focus:outline-none focus:border-[#111315] transition-colors"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#111315] transition-colors cursor-pointer rounded-md focus:outline-none"
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 

@@ -3,20 +3,31 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { LineChart, Compass } from "lucide-react";
+import { FinancialInsightsContent } from "@/lib/content/defaults";
 
-export default function FinancialInsights() {
-    const services = [
-        { 
-            icon: <LineChart className="w-6 h-6 text-[#FEACC6]" />, 
-            title: "Financial Reporting & Visibility", 
-            description: "Financial reports should help you understand what is happening in your business. Prospera provides monthly financial reporting support designed to give owners clearer visibility into revenue, expenses, profitability, cash flow, account balances, trends, and areas that may need attention. Reports should not just exist. They should be useful." 
-        },
-        { 
-            icon: <Compass className="w-6 h-6 text-[#FEACC6]" />, 
-            title: "Visibility for Operational Decisions", 
-            description: "As a business becomes more complex, financial questions become more important. Prospera helps owners understand what their numbers are showing so decisions around payroll, pricing, hiring, taxes, cash flow, expenses, financing, and owner compensation are made with more visibility and less guesswork." 
-        },
-    ];
+const defaultIcons = [
+    <LineChart key="chart" className="w-6 h-6 text-[#FEACC6]" />,
+    <Compass key="compass" className="w-6 h-6 text-[#FEACC6]" />
+];
+
+const defaultServices = [
+    { 
+        title: "Financial Reporting & Visibility", 
+        description: "Financial reports should help you understand what is happening in your business. Prospera provides monthly financial reporting support designed to give owners clearer visibility into revenue, expenses, profitability, cash flow, account balances, trends, and areas that may need attention. Reports should not just exist. They should be useful." 
+    },
+    { 
+        title: "Visibility for Operational Decisions", 
+        description: "As a business becomes more complex, financial questions become more important. Prospera helps owners understand what their numbers are showing so decisions around payroll, pricing, hiring, taxes, cash flow, expenses, financing, and owner compensation are made with more visibility and less guesswork." 
+    },
+];
+
+interface FinancialInsightsProps {
+    content?: FinancialInsightsContent;
+}
+
+export default function FinancialInsights({ content }: FinancialInsightsProps) {
+    const heading = content?.heading || "Reporting & Operational Visibility";
+    const services = content?.services && content.services.length > 0 ? content.services : defaultServices;
 
     return (
         <section className="bg-[#37414F] py-24 lg:py-32 text-white relative overflow-hidden">
@@ -49,7 +60,7 @@ export default function FinancialInsights() {
                         className="flex flex-col items-start pt-2"
                     >
                         <h2 className="text-[2.5rem] lg:text-[4rem] font-serif font-normal leading-[1.1] mb-8">
-                            Reporting & Operational Visibility
+                            {heading}
                         </h2>
                         
                         {/* Table / List structure */}
@@ -61,7 +72,7 @@ export default function FinancialInsights() {
                                 >
                                     {/* Icon Container */}
                                     <div className="w-12 h-12 border border-white/20 rounded-[8px] flex items-center justify-center shrink-0 bg-white/5">
-                                        {s.icon}
+                                        {defaultIcons[i % defaultIcons.length]}
                                     </div>
                                     <div>
                                         <h3 className="text-[17px] lg:text-[19px] font-sans font-bold tracking-wide text-white mb-2 text-left">

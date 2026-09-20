@@ -1,28 +1,41 @@
 "use client";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock } from "lucide-react";
+import { AlternativeContactContent } from "@/lib/content/defaults";
 
-const contactOptions = [
-    {
-        icon: <Mail className="w-5 h-5 text-[#FEACC6]" />,
-        label: "Email Address",
-        value: "admin@prosperagroup.us",
-        href: "mailto:admin@prosperagroup.us",
-    },
-    {
-        icon: <Phone className="w-5 h-5 text-[#FEACC6]" />,
-        label: "Phone Number",
-        value: "+1 (336) 860-7529",
-        href: "tel:+13368607529",
-    },
-    {
-        icon: <Clock className="w-5 h-5 text-[#FEACC6]" />,
-        label: "Hours",
-        value: "Monday–Friday | 9:00 AM – 5:00 PM EST",
-    },
-];
+interface AlternativeContactProps {
+    content?: AlternativeContactContent;
+}
 
-export default function AlternativeContact() {
+export default function AlternativeContact({ content }: AlternativeContactProps) {
+    const heading = content?.heading || "Alternative Contact Options";
+    const emailLabel = content?.emailLabel || "Email Address";
+    const emailValue = content?.emailValue || "admin@prosperagroup.us";
+    const phoneLabel = content?.phoneLabel || "Phone Number";
+    const phoneValue = content?.phoneValue || "+1 (336) 860-7529";
+    const hoursLabel = content?.hoursLabel || "Hours";
+    const hoursValue = content?.hoursValue || "Monday–Friday | 9:00 AM – 5:00 PM EST";
+
+    const contactOptions = [
+        {
+            icon: <Mail className="w-5 h-5 text-[#FEACC6]" />,
+            label: emailLabel,
+            value: emailValue,
+            href: `mailto:${emailValue}`,
+        },
+        {
+            icon: <Phone className="w-5 h-5 text-[#FEACC6]" />,
+            label: phoneLabel,
+            value: phoneValue,
+            href: `tel:${phoneValue.replace(/[^0-9+]/g, '')}`,
+        },
+        {
+            icon: <Clock className="w-5 h-5 text-[#FEACC6]" />,
+            label: hoursLabel,
+            value: hoursValue,
+        },
+    ];
+
     return (
         <section className="bg-white pb-24 lg:pb-32">
             <div className="container mx-auto px-6 lg:px-12 text-center">
@@ -33,7 +46,7 @@ export default function AlternativeContact() {
                     transition={{ duration: 0.8 }}
                     className="text-[2.5rem] lg:text-[4rem] font-serif font-medium text-[#111315] leading-tight mb-20"
                 >
-                    Alternative Contact Options
+                    {heading}
                 </motion.h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">

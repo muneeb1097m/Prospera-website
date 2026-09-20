@@ -2,16 +2,26 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Wrench } from "lucide-react";
+import { CleanupServicesContent } from "@/lib/content/defaults";
 
-export default function CleanupServices() {
-    const cleanupIncludes = [
-        "Reviewing prior transactions",
-        "Correcting categorization issues",
-        "Reconciling bank & credit card accounts",
-        "Organizing missing records",
-        "Reviewing balance sheet issues",
-        "Preparing the books for ongoing monthly support"
-    ];
+const defaultIncludes = [
+    "Reviewing prior transactions",
+    "Correcting categorization issues",
+    "Reconciling bank & credit card accounts",
+    "Organizing missing records",
+    "Reviewing balance sheet issues",
+    "Preparing the books for ongoing monthly support"
+];
+
+interface CleanupServicesProps {
+    content?: CleanupServicesContent;
+}
+
+export default function CleanupServices({ content }: CleanupServicesProps) {
+    const heading = content?.heading || "Cleanup & Catch-Up Support";
+    const description = content?.description || "If your books are behind, messy, or unclear, ongoing monthly support may not be the first step. Prospera can review your current financial records and identify what needs to be cleaned up before a monthly process begins.";
+    const boxTitle = content?.boxTitle || "What Cleanup Work May Include";
+    const bullets = content?.bullets && content.bullets.length > 0 ? content.bullets : defaultIncludes;
 
     return (
         <section className="bg-white py-16 lg:py-24">
@@ -44,10 +54,10 @@ export default function CleanupServices() {
                             transition={{ duration: 0.8 }}
                         >
                             <h2 className="text-[2.5rem] lg:text-[3.5rem] font-serif font-normal leading-[1.1] mb-6">
-                                Cleanup & Catch-Up Support
+                                {heading}
                             </h2>
                             <p className="text-[15px] lg:text-[17px] text-white/80 font-sans font-light mb-8 max-w-lg leading-relaxed">
-                                If your books are behind, messy, or unclear, ongoing monthly support may not be the first step. Prospera can review your current financial records and identify what needs to be cleaned up before a monthly process begins.
+                                {description}
                             </p>
 
                             {/* Callout Box */}
@@ -55,11 +65,11 @@ export default function CleanupServices() {
                                 <div className="flex items-center gap-3 mb-6">
                                     <Wrench className="w-5 h-5 text-[#FEACC6]" />
                                     <h3 className="text-[12px] lg:text-[13px] font-serif italic font-bold text-white uppercase tracking-[0.15em]">
-                                        What Cleanup Work May Include
+                                        {boxTitle}
                                     </h3>
                                 </div>
                                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {cleanupIncludes.map((item, idx) => (
+                                    {bullets.map((item, idx) => (
                                         <li key={idx} className="text-[13px] lg:text-[14px] text-white/80 font-sans font-light leading-relaxed flex items-center gap-2">
                                             <span className="w-1.5 h-1.5 bg-[#FEACC6] rounded-full shrink-0"></span>
                                             <span>{item}</span>

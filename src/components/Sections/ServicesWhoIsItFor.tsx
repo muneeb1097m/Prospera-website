@@ -1,16 +1,31 @@
 "use client";
 import { motion } from "framer-motion";
 import { Check, AlertCircle } from "lucide-react";
+import { ServicesWhoIsItForContent } from "@/lib/content/defaults";
 
-export default function ServicesWhoIsItFor() {
-    const listItems = [
-        "You have outgrown DIY bookkeeping.",
-        "Your books are current, but your reports are not useful.",
-        "Revenue is growing, but cash flow still feels unclear.",
-        "Tax season keeps creating stress or surprises.",
-        "Your business has more accounts, systems, or moving parts than before.",
-        "You need more organization around financial reporting and decision-making."
-    ];
+const defaultListItems = [
+    "You have outgrown DIY bookkeeping.",
+    "Your books are current, but your reports are not useful.",
+    "Revenue is growing, but cash flow still feels unclear.",
+    "Tax season keeps creating stress or surprises.",
+    "Your business has more accounts, systems, or moving parts than before.",
+    "You need more organization around financial reporting and decision-making."
+];
+
+const defaultScopeItems = [
+    "Prospera may not be the right next step if your current needs are limited to basic transaction entry only, your business is not yet at a stage where a structured monthly process makes sense, or you are looking for unlimited advisory support without defined boundaries."
+];
+
+interface ServicesWhoIsItForProps {
+    content?: ServicesWhoIsItForContent;
+}
+
+export default function ServicesWhoIsItFor({ content }: ServicesWhoIsItForProps) {
+    const heading = content?.heading || "Who This Is For";
+    const intro = content?.intro || "Prospera is designed for businesses where:";
+    const listItems = content?.items && content.items.length > 0 ? content.items : defaultListItems;
+    const scopeTitle = content?.scopeTitle || "Scope Clarification";
+    const scopeItems = content?.scopeItems && content.scopeItems.length > 0 ? content.scopeItems : defaultScopeItems;
 
     return (
         <section className="bg-[#FAF7F2] py-24 lg:py-32">
@@ -26,10 +41,10 @@ export default function ServicesWhoIsItFor() {
                             transition={{ duration: 0.8 }}
                         >
                             <h2 className="text-[2.25rem] lg:text-[3.25rem] font-serif font-normal text-[#111315] leading-tight mb-8">
-                                Who This Is For
+                                {heading}
                             </h2>
                             <p className="text-[16px] lg:text-[18px] text-[#444] font-sans font-light mb-8">
-                                Prospera is designed for businesses where:
+                                {intro}
                             </p>
                             
                             <ul className="flex flex-col gap-4">
@@ -57,13 +72,15 @@ export default function ServicesWhoIsItFor() {
                             <div className="flex items-center gap-3.5 mb-6">
                                 <AlertCircle className="w-6 h-6 text-[#FEACC6] shrink-0" />
                                 <h3 className="text-[18px] lg:text-[21px] font-serif font-normal text-[#111315]">
-                                    Scope Clarification
+                                    {scopeTitle}
                                 </h3>
                             </div>
                             
-                            <p className="text-[14px] lg:text-[15px] text-[#555] font-sans font-light leading-relaxed mb-6">
-                                Prospera may not be the right next step if your current needs are limited to basic transaction entry only, your business is not yet at a stage where a structured monthly process makes sense, or you are looking for unlimited advisory support without defined boundaries.
-                            </p>
+                            {scopeItems.map((text, idx) => (
+                                <p key={idx} className="text-[14px] lg:text-[15px] text-[#555] font-sans font-light leading-relaxed mb-4 last:mb-0">
+                                    {text}
+                                </p>
+                            ))}
                         </motion.div>
                     </div>
 

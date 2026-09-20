@@ -1,10 +1,18 @@
 "use client";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { ServicesHeroContent } from "@/lib/content/defaults";
 
-export default function ServicesHero() {
+interface ServicesHeroProps {
+    content?: ServicesHeroContent;
+}
+
+export default function ServicesHero({ content }: ServicesHeroProps) {
+    const badge = content?.badge || "SERVICES";
+    const heading = content?.heading || "Monthly Financial Clarity & Bookkeeping Support";
+    const description = content?.description || "When your business has more moving parts, basic bookkeeping stops being enough. Prospera provides monthly financial support for businesses that need cleaner records, clearer reporting, tax-ready organization, and better visibility before decisions are made.";
+
     return (
-        /* FIXED: Background updated to match your core brand dark gray */
         <section className="relative bg-[#111315] text-white pt-28 pb-12 lg:pt-32 lg:pb-16 overflow-hidden text-center">
             <div className="container mx-auto px-6 lg:px-12 relative z-10">
                 <motion.div
@@ -13,22 +21,19 @@ export default function ServicesHero() {
                     transition={{ duration: 0.8 }}
                     className="flex flex-col items-center"
                 >
-                    {/* FIXED BADGE: Swapped rounded-full for rounded-[8px] to match your rectangular design language */}
                     <div className="bg-[#FEACC6] text-[#111315] px-6 py-2.5 rounded-[8px] text-[13px] font-sans font-bold uppercase tracking-[0.1em] mb-10 inline-block">
-                        SERVICES
+                        {badge}
                     </div>
 
-                    {/* FIXED HEADING: Using font-normal to keep Didot elegant and refined as per Figma */}
                     <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[5rem] font-serif font-normal leading-[1.1] max-w-5xl mx-auto">
-                        Monthly Financial Clarity & Bookkeeping Support
+                        {heading}
                     </h1>
                     <p className="text-[16px] lg:text-[19px] text-white/80 font-sans font-light max-w-3xl mx-auto mt-8 leading-relaxed">
-                        When your business has more moving parts, basic bookkeeping stops being enough. Prospera provides monthly financial support for businesses that need cleaner records, clearer reporting, tax-ready organization, and better visibility before decisions are made.
+                        {description}
                     </p>
                 </motion.div>
             </div>
 
-            {/* FIXED DECORATION: Added the whitelogo.png anchored to the bottom right as seen in your screenshot */}
             <div className="absolute -bottom-10 -right-10 w-[300px] lg:w-[600px] h-[300px] lg:h-[600px] opacity-[0.06] pointer-events-none">
                 <Image
                     src="/whitelogo.png"

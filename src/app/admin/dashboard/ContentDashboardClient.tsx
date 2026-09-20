@@ -18,18 +18,23 @@ import {
   ChevronRight,
   Plus,
   Trash2,
+  FileText,
+  UserCheck,
+  HelpCircle,
 } from 'lucide-react';
 import { saveSectionContentAction } from '../actions';
-import { defaultSiteContent } from '@/lib/content/defaults';
+import { defaultSiteContent, SiteContent } from '@/lib/content/defaults';
 
-type SiteContentState = typeof defaultSiteContent;
+type SiteContentState = SiteContent;
 
 interface Props {
   initialContent: SiteContentState;
 }
 
+type TabKey = keyof SiteContentState;
+
 interface SectionItem {
-  id: keyof SiteContentState;
+  id: TabKey;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   desc: string;
@@ -54,25 +59,53 @@ const SECTIONS: SectionGroup[] = [
     ],
   },
   {
+    group: 'About Page',
+    items: [
+      { id: 'about_hero', label: 'About Hero', icon: Layout, desc: 'Header badge and main headline' },
+      { id: 'about_opening', label: 'Opening Manifesto', icon: FileText, desc: 'Core philosophy & mission paragraph' },
+      { id: 'about_founder', label: 'Founder & EA Led', icon: UserCheck, desc: 'IRS Enrolled Agent badge & narrative' },
+      { id: 'about_why_different', label: 'Why We Are Different', icon: Layers, desc: '5 distinct value cards & descriptions' },
+      { id: 'about_final_cta', label: 'Bottom Banner CTA', icon: Megaphone, desc: 'Pre-footer conversion banner for About' },
+    ],
+  },
+  {
+    group: 'Services Page',
+    items: [
+      { id: 'services_hero', label: 'Services Hero', icon: Layout, desc: 'Headline, badge, and intro copy' },
+      { id: 'services_opening', label: 'Opening Callout', icon: FileText, desc: 'Two-column perspective statement' },
+      { id: 'services_monthly_bookkeeping', label: 'Monthly Foundation', icon: BarChart3, desc: 'Bookkeeping scope & tax-ready support' },
+      { id: 'services_financial_insights', label: 'Reporting & Visibility', icon: Briefcase, desc: 'Operational decision support services' },
+      { id: 'services_cleanup', label: 'Cleanup & Catch-Up', icon: Layers, desc: 'Catch-up support description & items' },
+      { id: 'services_who_is_it_for', label: 'Who This Is For', icon: CheckSquare, desc: 'Target business traits & scope note' },
+      { id: 'services_final_cta', label: 'Bottom Banner CTA', icon: Megaphone, desc: 'Pre-footer conversion banner for Services' },
+    ],
+  },
+  {
+    group: 'How It Works Page',
+    items: [
+      { id: 'how_it_works_hero', label: 'Process Hero', icon: Layout, desc: 'Page headline and intro paragraph' },
+      { id: 'how_it_works_steps', label: '4-Step Process', icon: Layers, desc: 'Diagnostic, scope, monthly & tax-ready' },
+      { id: 'how_it_works_final_cta', label: 'Bottom Banner CTA', icon: Megaphone, desc: 'Pre-footer conversion banner' },
+    ],
+  },
+  {
+    group: 'Contact Page',
+    items: [
+      { id: 'contact_hero', label: 'Contact Hero', icon: Layout, desc: 'Contact page title and badge' },
+      { id: 'contact_form_info', label: 'Form Copy & Guidance', icon: HelpCircle, desc: 'Form headline, intro, and checklist' },
+      { id: 'contact_alternative', label: 'Alternative Options', icon: PhoneCall, desc: 'Email, phone, and business hours' },
+    ],
+  },
+  {
     group: 'Site-wide Settings',
     items: [
-      { id: 'contact_info', label: 'Contact & Company', icon: PhoneCall, desc: 'Email, phone, office address, & footer' },
+      { id: 'contact_info', label: 'Company & Footer', icon: PhoneCall, desc: 'Global email, phone, address, and footer copy' },
     ],
   },
 ];
 
 export default function ContentDashboardClient({ initialContent }: Props) {
-  const [activeTab, setActiveTab] = useState<
-    | 'home_hero'
-    | 'home_stats'
-    | 'home_what_we_help_with'
-    | 'home_tailored_services'
-    | 'home_how_it_works'
-    | 'home_testimonials'
-    | 'home_final_cta'
-    | 'contact_info'
-  >('home_hero');
-
+  const [activeTab, setActiveTab] = useState<TabKey>('home_hero');
   const [content, setContent] = useState<SiteContentState>(initialContent);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -85,7 +118,13 @@ export default function ContentDashboardClient({ initialContent }: Props) {
   const handleSaveActiveSection = async () => {
     setIsSaving(true);
     const sectionData = content[activeTab];
-    const category = activeTab === 'contact_info' ? 'global' : 'home';
+    
+    let category = 'home';
+    if (activeTab.startsWith('about_')) category = 'about';
+    else if (activeTab.startsWith('services_')) category = 'services';
+    else if (activeTab.startsWith('how_it_works_')) category = 'how-it-works';
+    else if (activeTab.startsWith('contact_')) category = 'contact';
+    else if (activeTab === 'contact_info') category = 'global';
 
     const res = await saveSectionContentAction(activeTab, category, sectionData as unknown as Record<string, unknown>);
     setIsSaving(false);
@@ -107,65 +146,67 @@ export default function ContentDashboardClient({ initialContent }: Props) {
     }
   };
 
-  // Find active section meta
-  const activeMeta = SECTIONS.flatMap((g) => g.items).find((i) => i.id === activeTab);
+  // Find active section metadata
+  let activeMeta: SectionItem | undefined;
+  for (const group of SECTIONS) {
+    const found = group.items.find((i) => i.id === activeTab);
+    if (found) {
+      activeMeta = found;
+      break;
+    }
+  }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      
+    <div className="space-y-8">
       {/* Toast Notification */}
       {toast && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-medium border backdrop-blur-md transition-all animate-in fade-in slide-in-from-bottom-3 duration-200 ${
+          className={`fixed bottom-6 right-6 z-50 px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-medium transition-all animate-in fade-in slide-in-from-bottom-5 border ${
             toast.type === 'success'
-              ? 'bg-emerald-900/90 text-white border-emerald-700 shadow-emerald-950/20'
-              : 'bg-red-900/90 text-white border-red-700 shadow-red-950/20'
+              ? 'bg-white text-emerald-900 border-emerald-200'
+              : 'bg-white text-red-900 border-red-200'
           }`}
         >
           {toast.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-red-300 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
           )}
           <span>{toast.message}</span>
         </div>
       )}
 
-      {/* Top Header & Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200/70 shadow-xs">
+      {/* Top Welcome Card */}
+      <div className="bg-white border border-gray-200/70 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-serif text-gray-900 font-semibold tracking-tight">
-              Website Content Manager
-            </h1>
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Connected
-            </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FEACC6]/20 text-[#111315] text-[11px] font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-[#111315]" />
+            <span>Complete Website CMS Portal</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Modify text content across your site. All layouts, responsiveness, and styles remain safely locked.
+          <h1 className="text-2xl md:text-3xl font-serif font-normal text-gray-900 tracking-tight">
+            Site-Wide Content Editor
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 max-w-2xl font-light leading-relaxed">
+            Modify text copy for any page on your website directly. Changes are deployed to your live site immediately without altering layouts or styles.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             type="button"
             onClick={handleResetToDefault}
-            className="text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 px-3.5 py-2.5 rounded-xl border border-gray-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Reset active tab to original website text"
+            className="bg-gray-100 hover:bg-gray-200/80 text-gray-700 font-medium text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-gray-400" />
-            <span>Reset Defaults</span>
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset Section</span>
           </button>
-
           <button
             type="button"
             onClick={handleSaveActiveSection}
             disabled={isSaving}
-            className="bg-[#111315] hover:bg-black text-white font-medium text-xs tracking-wide px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shadow-sm active:scale-[0.98]"
+            className="bg-[#111315] hover:bg-black text-white font-medium text-xs px-6 py-2.5 rounded-xl transition-all shadow-md shadow-black/10 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="w-3.5 h-3.5" />
+            <Save className="w-4 h-4" />
             <span>{isSaving ? 'Publishing...' : 'Save Changes'}</span>
           </button>
         </div>
@@ -174,14 +215,14 @@ export default function ContentDashboardClient({ initialContent }: Props) {
       {/* Main Grid: Sidebar + Editor */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Modern Sidebar Navigation (4 cols) */}
-        <aside className="lg:col-span-4 space-y-6">
+        {/* Navigation Sidebar (4 cols) */}
+        <aside className="lg:col-span-4 bg-white rounded-2xl border border-gray-200/70 p-4 md:p-5 shadow-xs space-y-6">
           {SECTIONS.map((group, gIdx) => (
-            <div key={gIdx} className="bg-white rounded-2xl border border-gray-200/70 p-3 shadow-xs">
-              <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            <div key={gIdx} className="space-y-1.5">
+              <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">
                 {group.group}
               </div>
-              <div className="space-y-1 mt-1">
+              <div className="space-y-1">
                 {group.items.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -189,10 +230,10 @@ export default function ContentDashboardClient({ initialContent }: Props) {
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                      className={`w-full text-left px-3.5 py-3 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-[#111315] text-white font-medium shadow-sm'
+                          ? 'bg-[#111315] text-white shadow-sm'
                           : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
@@ -244,234 +285,193 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </button>
           </div>
 
-          {/* Section 1: Hero */}
+          {/* ======================================================= */}
+          {/* HOMEPAGE SECTIONS */}
+          {/* ======================================================= */}
+
+          {/* Home Hero */}
           {activeTab === 'home_hero' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Headline Line 1 (Prefix)
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Line 1 Prefix
                   </label>
                   <input
                     type="text"
                     value={content.home_hero.line1Prefix}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_hero: { ...content.home_hero, line1Prefix: e.target.value },
-                      })
+                      setContent({ ...content, home_hero: { ...content.home_hero, line1Prefix: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                   />
                 </div>
-
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700">
-                      Line 1 (Pink Emphasis)
-                    </label>
-                    <span className="text-[10px] font-semibold text-[#cf587d] bg-[#fcecf1] px-2 py-0.5 rounded-full">
-                      Italic Highlight
-                    </span>
-                  </div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Line 1 Highlight (Italic Didot)
+                  </label>
                   <input
                     type="text"
                     value={content.home_hero.line1Emphasis}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_hero: { ...content.home_hero, line1Emphasis: e.target.value },
-                      })
+                      setContent({ ...content, home_hero: { ...content.home_hero, line1Emphasis: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-medium focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Headline Line 2
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Line 2 Main Headline
                 </label>
                 <input
                   type="text"
                   value={content.home_hero.line2}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_hero: { ...content.home_hero, line2: e.target.value },
-                    })
+                    setContent({ ...content, home_hero: { ...content.home_hero, line2: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Hero Subtitle / Description Paragraph
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Subtitle Paragraph
                 </label>
                 <textarea
                   rows={3}
                   value={content.home_hero.subtitle}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_hero: { ...content.home_hero, subtitle: e.target.value },
-                    })
+                    setContent({ ...content, home_hero: { ...content.home_hero, subtitle: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Primary Button Label
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Primary CTA Button Text
                   </label>
                   <input
                     type="text"
                     value={content.home_hero.ctaPrimaryText}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_hero: { ...content.home_hero, ctaPrimaryText: e.target.value },
-                      })
+                      setContent({ ...content, home_hero: { ...content.home_hero, ctaPrimaryText: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Secondary Button Label
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Secondary CTA Button Text
                   </label>
                   <input
                     type="text"
                     value={content.home_hero.ctaSecondaryText}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_hero: { ...content.home_hero, ctaSecondaryText: e.target.value },
-                      })
+                      setContent({ ...content, home_hero: { ...content.home_hero, ctaSecondaryText: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Local / Trust Note (Small Footer Copy in Hero)
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Trust & Location Statement
                 </label>
                 <textarea
                   rows={2}
                   value={content.home_hero.trustText}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_hero: { ...content.home_hero, trustText: e.target.value },
-                    })
+                    setContent({ ...content, home_hero: { ...content.home_hero, trustText: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
             </div>
           )}
 
-          {/* Section 2: Stats & Trust */}
+          {/* Home Stats */}
           {activeTab === 'home_stats' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Main Statement Heading
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
                 </label>
                 <input
                   type="text"
                   value={content.home_stats.heading}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_stats: { ...content.home_stats, heading: e.target.value },
-                    })
+                    setContent({ ...content, home_stats: { ...content.home_stats, heading: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Subtext Description
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Subtitle
                 </label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={content.home_stats.subtext}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_stats: { ...content.home_stats, subtext: e.target.value },
-                    })
+                    setContent({ ...content, home_stats: { ...content.home_stats, subtext: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Right Card Heading
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Trust Pillars Title
                 </label>
                 <input
                   type="text"
                   value={content.home_stats.whyTrustTitle}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_stats: { ...content.home_stats, whyTrustTitle: e.target.value },
-                    })
+                    setContent({ ...content, home_stats: { ...content.home_stats, whyTrustTitle: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
-              <div className="pt-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">
-                  Trust Points (4 Blocks)
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {content.home_stats.trustPoints.map((point, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#fbfbfb] border border-gray-200/80 rounded-xl p-4 space-y-2.5"
-                    >
-                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        Pillar 0{index + 1}
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-4">
+                  Trust Pillars (4 Points)
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {content.home_stats.trustPoints.map((point, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-3">
+                      <div>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Pillar {idx + 1} Title</span>
+                        <input
+                          type="text"
+                          value={point.title}
+                          onChange={(e) => {
+                            const next = [...content.home_stats.trustPoints];
+                            next[idx].title = e.target.value;
+                            setContent({ ...content, home_stats: { ...content.home_stats, trustPoints: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={point.title}
-                        onChange={(e) => {
-                          const newPoints = [...content.home_stats.trustPoints];
-                          newPoints[index].title = e.target.value;
-                          setContent({
-                            ...content,
-                            home_stats: { ...content.home_stats, trustPoints: newPoints },
-                          });
-                        }}
-                        placeholder="Title"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
-                      />
-                      <textarea
-                        rows={2}
-                        value={point.desc}
-                        onChange={(e) => {
-                          const newPoints = [...content.home_stats.trustPoints];
-                          newPoints[index].desc = e.target.value;
-                          setContent({
-                            ...content,
-                            home_stats: { ...content.home_stats, trustPoints: newPoints },
-                          });
-                        }}
-                        placeholder="Description"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-900 leading-relaxed"
-                      />
+                      <div>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Pillar {idx + 1} Description</span>
+                        <textarea
+                          rows={2}
+                          value={point.desc}
+                          onChange={(e) => {
+                            const next = [...content.home_stats.trustPoints];
+                            next[idx].desc = e.target.value;
+                            setContent({ ...content, home_stats: { ...content.home_stats, trustPoints: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -479,138 +479,99 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </div>
           )}
 
-          {/* Section 3: What We Help With */}
+          {/* Home What We Help With */}
           {activeTab === 'home_what_we_help_with' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Section Heading
-                  </label>
-                  <input
-                    type="text"
-                    value={content.home_what_we_help_with.heading}
-                    onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_what_we_help_with: {
-                          ...content.home_what_we_help_with,
-                          heading: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Tagline (Upper Badge)
-                  </label>
-                  <input
-                    type="text"
-                    value={content.home_what_we_help_with.tagline}
-                    onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_what_we_help_with: {
-                          ...content.home_what_we_help_with,
-                          tagline: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors font-medium"
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Advantage Paragraph 1
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
                 </label>
-                <textarea
-                  rows={2}
-                  value={content.home_what_we_help_with.description1}
+                <input
+                  type="text"
+                  value={content.home_what_we_help_with.heading}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_what_we_help_with: {
-                        ...content.home_what_we_help_with,
-                        description1: e.target.value,
-                      },
-                    })
+                    setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, heading: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Advantage Paragraph 2
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Tagline Statement
                 </label>
-                <textarea
-                  rows={2}
-                  value={content.home_what_we_help_with.description2}
+                <input
+                  type="text"
+                  value={content.home_what_we_help_with.tagline}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_what_we_help_with: {
-                        ...content.home_what_we_help_with,
-                        description2: e.target.value,
-                      },
-                    })
+                    setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, tagline: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
-              <div className="pt-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">
-                  Services List (5 Items)
-                </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Description Paragraph 1
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={content.home_what_we_help_with.description1}
+                    onChange={(e) =>
+                      setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, description1: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Description Paragraph 2
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={content.home_what_we_help_with.description2}
+                    onChange={(e) =>
+                      setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, description2: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-4">
+                  Services List (5 Services)
+                </label>
                 <div className="space-y-3">
-                  {content.home_what_we_help_with.services.map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#fbfbfb] border border-gray-200/80 rounded-xl p-4 space-y-2.5"
-                    >
-                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        Service 0{index + 1}
+                  {content.home_what_we_help_with.services.map((item, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row gap-4">
+                      <div className="sm:w-1/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Service {idx + 1}</span>
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => {
+                            const next = [...content.home_what_we_help_with.services];
+                            next[idx].title = e.target.value;
+                            setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, services: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={item.title}
-                        onChange={(e) => {
-                          const newServices = [...content.home_what_we_help_with.services];
-                          newServices[index].title = e.target.value;
-                          setContent({
-                            ...content,
-                            home_what_we_help_with: {
-                              ...content.home_what_we_help_with,
-                              services: newServices,
-                            },
-                          });
-                        }}
-                        placeholder="Title"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
-                      />
-                      <textarea
-                        rows={2}
-                        value={item.description}
-                        onChange={(e) => {
-                          const newServices = [...content.home_what_we_help_with.services];
-                          newServices[index].description = e.target.value;
-                          setContent({
-                            ...content,
-                            home_what_we_help_with: {
-                              ...content.home_what_we_help_with,
-                              services: newServices,
-                            },
-                          });
-                        }}
-                        placeholder="Description"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-900 leading-relaxed"
-                      />
+                      <div className="sm:w-2/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Description</span>
+                        <textarea
+                          rows={2}
+                          value={item.description}
+                          onChange={(e) => {
+                            const next = [...content.home_what_we_help_with.services];
+                            next[idx].description = e.target.value;
+                            setContent({ ...content, home_what_we_help_with: { ...content.home_what_we_help_with, services: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -618,76 +579,56 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </div>
           )}
 
-          {/* Section 4: Tailored Services */}
+          {/* Home Tailored Services */}
           {activeTab === 'home_tailored_services' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Section Heading
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
                 </label>
                 <input
                   type="text"
                   value={content.home_tailored_services.heading}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_tailored_services: {
-                        ...content.home_tailored_services,
-                        heading: e.target.value,
-                      },
-                    })
+                    setContent({ ...content, home_tailored_services: { ...content.home_tailored_services, heading: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
-              <div className="pt-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">
-                  Industry Cards (5 Cards)
-                </h3>
-                <div className="space-y-3">
-                  {content.home_tailored_services.services.map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#fbfbfb] border border-gray-200/80 rounded-xl p-4 space-y-2.5"
-                    >
-                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        Industry Card 0{index + 1}
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-4">
+                  Industry Cards (4 Categories)
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {content.home_tailored_services.services.map((item, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-3">
+                      <div>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Card {idx + 1} Title</span>
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => {
+                            const next = [...content.home_tailored_services.services];
+                            next[idx].title = e.target.value;
+                            setContent({ ...content, home_tailored_services: { ...content.home_tailored_services, services: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={item.title}
-                        onChange={(e) => {
-                          const newServices = [...content.home_tailored_services.services];
-                          newServices[index].title = e.target.value;
-                          setContent({
-                            ...content,
-                            home_tailored_services: {
-                              ...content.home_tailored_services,
-                              services: newServices,
-                            },
-                          });
-                        }}
-                        placeholder="Industry Title"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
-                      />
-                      <textarea
-                        rows={2}
-                        value={item.description}
-                        onChange={(e) => {
-                          const newServices = [...content.home_tailored_services.services];
-                          newServices[index].description = e.target.value;
-                          setContent({
-                            ...content,
-                            home_tailored_services: {
-                              ...content.home_tailored_services,
-                              services: newServices,
-                            },
-                          });
-                        }}
-                        placeholder="Description"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-900 leading-relaxed"
-                      />
+                      <div>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Card {idx + 1} Description</span>
+                        <textarea
+                          rows={3}
+                          value={item.description}
+                          onChange={(e) => {
+                            const next = [...content.home_tailored_services.services];
+                            next[idx].description = e.target.value;
+                            setContent({ ...content, home_tailored_services: { ...content.home_tailored_services, services: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -695,118 +636,85 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </div>
           )}
 
-          {/* Section 5: How It Works */}
+          {/* Home How It Works */}
           {activeTab === 'home_how_it_works' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Section Heading
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
                 </label>
                 <input
                   type="text"
                   value={content.home_how_it_works.heading}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_how_it_works: {
-                        ...content.home_how_it_works,
-                        heading: e.target.value,
-                      },
-                    })
+                    setContent({ ...content, home_how_it_works: { ...content.home_how_it_works, heading: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
                     Note Badge Title
                   </label>
                   <input
                     type="text"
                     value={content.home_how_it_works.noteTitle}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_how_it_works: {
-                          ...content.home_how_it_works,
-                          noteTitle: e.target.value,
-                        },
-                      })
+                      setContent({ ...content, home_how_it_works: { ...content.home_how_it_works, noteTitle: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Note Disclaimer Text
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Note Explanation Text
                   </label>
-                  <input
-                    type="text"
+                  <textarea
+                    rows={2}
                     value={content.home_how_it_works.noteText}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_how_it_works: {
-                          ...content.home_how_it_works,
-                          noteText: e.target.value,
-                        },
-                      })
+                      setContent({ ...content, home_how_it_works: { ...content.home_how_it_works, noteText: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900"
                   />
                 </div>
               </div>
 
-              <div className="pt-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">
-                  Process Steps (3 Steps)
-                </h3>
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-4">
+                  3 Process Steps
+                </label>
                 <div className="space-y-3">
-                  {content.home_how_it_works.steps.map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#fbfbfb] border border-gray-200/80 rounded-xl p-4 space-y-2.5"
-                    >
-                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        Step 0{index + 1}
+                  {content.home_how_it_works.steps.map((step, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row gap-4">
+                      <div className="sm:w-1/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Step {idx + 1} Title</span>
+                        <input
+                          type="text"
+                          value={step.title}
+                          onChange={(e) => {
+                            const next = [...content.home_how_it_works.steps];
+                            next[idx].title = e.target.value;
+                            setContent({ ...content, home_how_it_works: { ...content.home_how_it_works, steps: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={item.title}
-                        onChange={(e) => {
-                          const newSteps = [...content.home_how_it_works.steps];
-                          newSteps[index].title = e.target.value;
-                          setContent({
-                            ...content,
-                            home_how_it_works: {
-                              ...content.home_how_it_works,
-                              steps: newSteps,
-                            },
-                          });
-                        }}
-                        placeholder="Step Title"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
-                      />
-                      <textarea
-                        rows={2}
-                        value={item.description}
-                        onChange={(e) => {
-                          const newSteps = [...content.home_how_it_works.steps];
-                          newSteps[index].description = e.target.value;
-                          setContent({
-                            ...content,
-                            home_how_it_works: {
-                              ...content.home_how_it_works,
-                              steps: newSteps,
-                            },
-                          });
-                        }}
-                        placeholder="Step Description"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-900 leading-relaxed"
-                      />
+                      <div className="sm:w-2/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Step {idx + 1} Description</span>
+                        <textarea
+                          rows={2}
+                          value={step.description}
+                          onChange={(e) => {
+                            const next = [...content.home_how_it_works.steps];
+                            next[idx].description = e.target.value;
+                            setContent({ ...content, home_how_it_works: { ...content.home_how_it_works, steps: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -814,82 +722,53 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </div>
           )}
 
-          {/* Section 6: Testimonials */}
+          {/* Home Testimonials */}
           {activeTab === 'home_testimonials' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Banner Label Prefix
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Banner Prefix
                   </label>
                   <input
                     type="text"
                     value={content.home_testimonials.bannerPrefix}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_testimonials: {
-                          ...content.home_testimonials,
-                          bannerPrefix: e.target.value,
-                        },
-                      })
+                      setContent({ ...content, home_testimonials: { ...content.home_testimonials, bannerPrefix: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Banner Highlighted Words
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Banner Highlight Words
                   </label>
                   <input
                     type="text"
                     value={content.home_testimonials.bannerHighlight}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        home_testimonials: {
-                          ...content.home_testimonials,
-                          bannerHighlight: e.target.value,
-                        },
-                      })
+                      setContent({ ...content, home_testimonials: { ...content.home_testimonials, bannerHighlight: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors font-medium"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                   />
                 </div>
               </div>
 
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900">
-                      Testimonial Quotes ({content.home_testimonials.testimonials.length} Total)
-                    </h3>
-                    <p className="text-[11px] text-gray-500 mt-0.5">
-                      Add, edit, or remove client reviews shown on the website.
-                    </p>
-                  </div>
+              <div className="pt-4 border-t border-gray-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold uppercase text-gray-600">
+                    Testimonials ({content.home_testimonials.testimonials.length})
+                  </label>
                   <button
                     type="button"
                     onClick={() => {
-                      const newTestimonials = [
+                      const next = [
                         ...content.home_testimonials.testimonials,
-                        {
-                          quote: "Working with Prospera has given me complete financial clarity and peace of mind.",
-                          author: "New Client",
-                          role: "Business Owner",
-                        },
+                        { quote: 'New client review...', author: 'Client Name', role: 'Business Owner' },
                       ];
-                      setContent({
-                        ...content,
-                        home_testimonials: {
-                          ...content.home_testimonials,
-                          testimonials: newTestimonials,
-                        },
-                      });
-                      showToast('success', 'New testimonial added! Remember to click "Save Changes".');
+                      setContent({ ...content, home_testimonials: { ...content.home_testimonials, testimonials: next } });
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#111315] hover:bg-black text-white text-xs font-medium rounded-lg transition-colors cursor-pointer shadow-xs"
+                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Testimonial</span>
@@ -897,87 +776,53 @@ export default function ContentDashboardClient({ initialContent }: Props) {
                 </div>
 
                 <div className="space-y-4">
-                  {content.home_testimonials.testimonials.map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#fbfbfb] border border-gray-200/80 rounded-xl p-4 space-y-3 relative group"
-                    >
+                  {content.home_testimonials.testimonials.map((item, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                          Review 0{index + 1}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm(`Remove testimonial #${index + 1} (${item.author || 'Review'})?`)) {
-                              const newTestimonials = content.home_testimonials.testimonials.filter((_, idx) => idx !== index);
-                              setContent({
-                                ...content,
-                                home_testimonials: {
-                                  ...content.home_testimonials,
-                                  testimonials: newTestimonials,
-                                },
-                              });
-                              showToast('success', 'Testimonial removed. Click "Save Changes" to publish.');
-                            }
-                          }}
-                          className="text-gray-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
-                          title="Delete this testimonial"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <span className="text-[11px] font-bold text-gray-400 uppercase">Card #{idx + 1}</span>
+                        {content.home_testimonials.testimonials.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = content.home_testimonials.testimonials.filter((_, i) => i !== idx);
+                              setContent({ ...content, home_testimonials: { ...content.home_testimonials, testimonials: next } });
+                            }}
+                            className="text-red-500 hover:text-red-700 p-1 rounded-md transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                       <textarea
                         rows={3}
                         value={item.quote}
                         onChange={(e) => {
-                          const newTestimonials = [...content.home_testimonials.testimonials];
-                          newTestimonials[index].quote = e.target.value;
-                          setContent({
-                            ...content,
-                            home_testimonials: {
-                              ...content.home_testimonials,
-                              testimonials: newTestimonials,
-                            },
-                          });
+                          const next = [...content.home_testimonials.testimonials];
+                          next[idx].quote = e.target.value;
+                          setContent({ ...content, home_testimonials: { ...content.home_testimonials, testimonials: next } });
                         }}
-                        placeholder="Quote"
-                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:border-gray-900 leading-relaxed italic"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900"
                       />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <input
                           type="text"
                           value={item.author}
                           onChange={(e) => {
-                            const newTestimonials = [...content.home_testimonials.testimonials];
-                            newTestimonials[index].author = e.target.value;
-                            setContent({
-                              ...content,
-                              home_testimonials: {
-                                ...content.home_testimonials,
-                                testimonials: newTestimonials,
-                              },
-                            });
+                            const next = [...content.home_testimonials.testimonials];
+                            next[idx].author = e.target.value;
+                            setContent({ ...content, home_testimonials: { ...content.home_testimonials, testimonials: next } });
                           }}
-                          placeholder="Client Name"
-                          className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
                         />
                         <input
                           type="text"
                           value={item.role}
                           onChange={(e) => {
-                            const newTestimonials = [...content.home_testimonials.testimonials];
-                            newTestimonials[index].role = e.target.value;
-                            setContent({
-                              ...content,
-                              home_testimonials: {
-                                ...content.home_testimonials,
-                                testimonials: newTestimonials,
-                              },
-                            });
+                            const next = [...content.home_testimonials.testimonials];
+                            next[idx].role = e.target.value;
+                            setContent({ ...content, home_testimonials: { ...content.home_testimonials, testimonials: next } });
                           }}
-                          placeholder="Role / Company"
-                          className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-900"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
                         />
                       </div>
                     </div>
@@ -987,171 +832,1304 @@ export default function ContentDashboardClient({ initialContent }: Props) {
             </div>
           )}
 
-          {/* Section 7: Final CTA */}
+          {/* Home Final CTA */}
           {activeTab === 'home_final_cta' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Headline
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Headline Text
                 </label>
                 <input
                   type="text"
                   value={content.home_final_cta.headline}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_final_cta: { ...content.home_final_cta, headline: e.target.value },
-                    })
+                    setContent({ ...content, home_final_cta: { ...content.home_final_cta, headline: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Body Paragraph
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Body Description
                 </label>
                 <textarea
                   rows={3}
                   value={content.home_final_cta.body}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_final_cta: { ...content.home_final_cta, body: e.target.value },
-                    })
+                    setContent({ ...content, home_final_cta: { ...content.home_final_cta, body: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Button Text
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Button Label
                 </label>
                 <input
                   type="text"
                   value={content.home_final_cta.buttonText}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      home_final_cta: { ...content.home_final_cta, buttonText: e.target.value },
-                    })
+                    setContent({ ...content, home_final_cta: { ...content.home_final_cta, buttonText: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
             </div>
           )}
 
-          {/* Section 8: Contact & Company Info */}
+          {/* ======================================================= */}
+          {/* ABOUT PAGE SECTIONS */}
+          {/* ======================================================= */}
+
+          {/* About Hero */}
+          {activeTab === 'about_hero' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Badge Label
+                </label>
+                <input
+                  type="text"
+                  value={content.about_hero.badge}
+                  onChange={(e) =>
+                    setContent({ ...content, about_hero: { ...content.about_hero, badge: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Headline Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={content.about_hero.line1}
+                    onChange={(e) =>
+                      setContent({ ...content, about_hero: { ...content.about_hero, line1: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Headline Line 2
+                  </label>
+                  <input
+                    type="text"
+                    value={content.about_hero.line2}
+                    onChange={(e) =>
+                      setContent({ ...content, about_hero: { ...content.about_hero, line2: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* About Opening */}
+          {activeTab === 'about_opening' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Large Manifesto Headline
+                </label>
+                <textarea
+                  rows={4}
+                  value={content.about_opening.headline}
+                  onChange={(e) =>
+                    setContent({ ...content, about_opening: { ...content.about_opening, headline: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Body Paragraph
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.about_opening.paragraph}
+                  onChange={(e) =>
+                    setContent({ ...content, about_opening: { ...content.about_opening, paragraph: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* About Founder */}
+          {activeTab === 'about_founder' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Credential Badge
+                  </label>
+                  <input
+                    type="text"
+                    value={content.about_founder.badge}
+                    onChange={(e) =>
+                      setContent({ ...content, about_founder: { ...content.about_founder, badge: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={content.about_founder.heading}
+                    onChange={(e) =>
+                      setContent({ ...content, about_founder: { ...content.about_founder, heading: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Founder Narrative Paragraphs ({content.about_founder.paragraphs.length})
+                </label>
+                <div className="space-y-3">
+                  {content.about_founder.paragraphs.map((p, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <span className="text-[11px] font-bold text-gray-400 uppercase">Paragraph {idx + 1}</span>
+                      <textarea
+                        rows={3}
+                        value={p}
+                        onChange={(e) => {
+                          const next = [...content.about_founder.paragraphs];
+                          next[idx] = e.target.value;
+                          setContent({ ...content, about_founder: { ...content.about_founder, paragraphs: next } });
+                        }}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs text-gray-900"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  CTA Button Label
+                </label>
+                <input
+                  type="text"
+                  value={content.about_founder.ctaText}
+                  onChange={(e) =>
+                    setContent({ ...content, about_founder: { ...content.about_founder, ctaText: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* About Why Different */}
+          {activeTab === 'about_why_different' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
+                </label>
+                <input
+                  type="text"
+                  value={content.about_why_different.heading}
+                  onChange={(e) =>
+                    setContent({ ...content, about_why_different: { ...content.about_why_different, heading: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-4">
+                  Value Cards (5 Pillars)
+                </label>
+                <div className="space-y-3">
+                  {content.about_why_different.items.map((item, idx) => (
+                    <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row gap-4">
+                      <div className="sm:w-1/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Pillar {idx + 1} Title</span>
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => {
+                            const next = [...content.about_why_different.items];
+                            next[idx].title = e.target.value;
+                            setContent({ ...content, about_why_different: { ...content.about_why_different, items: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                        />
+                      </div>
+                      <div className="sm:w-2/3">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase">Pillar {idx + 1} Description</span>
+                        <textarea
+                          rows={2}
+                          value={item.description}
+                          onChange={(e) => {
+                            const next = [...content.about_why_different.items];
+                            next[idx].description = e.target.value;
+                            setContent({ ...content, about_why_different: { ...content.about_why_different, items: next } });
+                          }}
+                          className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* About Final CTA */}
+          {activeTab === 'about_final_cta' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Headline Text
+                </label>
+                <input
+                  type="text"
+                  value={content.about_final_cta.headline}
+                  onChange={(e) =>
+                    setContent({ ...content, about_final_cta: { ...content.about_final_cta, headline: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Body Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.about_final_cta.body}
+                  onChange={(e) =>
+                    setContent({ ...content, about_final_cta: { ...content.about_final_cta, body: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Button Label
+                </label>
+                <input
+                  type="text"
+                  value={content.about_final_cta.buttonText}
+                  onChange={(e) =>
+                    setContent({ ...content, about_final_cta: { ...content.about_final_cta, buttonText: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================= */}
+          {/* SERVICES PAGE SECTIONS */}
+          {/* ======================================================= */}
+
+          {/* Services Hero */}
+          {activeTab === 'services_hero' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Badge
+                </label>
+                <input
+                  type="text"
+                  value={content.services_hero.badge}
+                  onChange={(e) =>
+                    setContent({ ...content, services_hero: { ...content.services_hero, badge: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Main Headline
+                </label>
+                <input
+                  type="text"
+                  value={content.services_hero.heading}
+                  onChange={(e) =>
+                    setContent({ ...content, services_hero: { ...content.services_hero, heading: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Hero Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.services_hero.description}
+                  onChange={(e) =>
+                    setContent({ ...content, services_hero: { ...content.services_hero, description: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Services Opening */}
+          {activeTab === 'services_opening' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Callout Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_opening.headingLine1}
+                    onChange={(e) =>
+                      setContent({ ...content, services_opening: { ...content.services_opening, headingLine1: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Callout Line 2
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_opening.headingLine2}
+                    onChange={(e) =>
+                      setContent({ ...content, services_opening: { ...content.services_opening, headingLine2: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Narrative Paragraph 1
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.services_opening.paragraph1}
+                  onChange={(e) =>
+                    setContent({ ...content, services_opening: { ...content.services_opening, paragraph1: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Narrative Paragraph 2
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.services_opening.paragraph2}
+                  onChange={(e) =>
+                    setContent({ ...content, services_opening: { ...content.services_opening, paragraph2: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Services Monthly Bookkeeping */}
+          {activeTab === 'services_monthly_bookkeeping' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_monthly_bookkeeping.heading}
+                    onChange={(e) =>
+                      setContent({
+                        ...content,
+                        services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, heading: e.target.value },
+                      })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Section Subtext
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_monthly_bookkeeping.subtext}
+                    onChange={(e) =>
+                      setContent({
+                        ...content,
+                        services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, subtext: e.target.value },
+                      })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+
+              {/* Card 1 */}
+              <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-4">
+                <span className="text-xs font-bold text-gray-700 uppercase">Card 1: Monthly Reconciliation</span>
+                <input
+                  type="text"
+                  value={content.services_monthly_bookkeeping.card1Title}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card1Title: e.target.value },
+                    })
+                  }
+                  className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 font-medium"
+                />
+                <textarea
+                  rows={2}
+                  value={content.services_monthly_bookkeeping.card1Desc}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card1Desc: e.target.value },
+                    })
+                  }
+                  className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                />
+                <div>
+                  <span className="text-[11px] font-bold text-gray-500 uppercase">Card 1 Checklist Bullets</span>
+                  <div className="space-y-2 mt-2">
+                    {content.services_monthly_bookkeeping.card1Bullets.map((bullet, idx) => (
+                      <input
+                        key={idx}
+                        type="text"
+                        value={bullet}
+                        onChange={(e) => {
+                          const next = [...content.services_monthly_bookkeeping.card1Bullets];
+                          next[idx] = e.target.value;
+                          setContent({
+                            ...content,
+                            services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card1Bullets: next },
+                          });
+                        }}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-4">
+                <span className="text-xs font-bold text-gray-700 uppercase">Card 2: Tax-Ready Support</span>
+                <input
+                  type="text"
+                  value={content.services_monthly_bookkeeping.card2Title}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card2Title: e.target.value },
+                    })
+                  }
+                  className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 font-medium"
+                />
+                <textarea
+                  rows={2}
+                  value={content.services_monthly_bookkeeping.card2Desc}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card2Desc: e.target.value },
+                    })
+                  }
+                  className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                />
+                <div>
+                  <span className="text-[11px] font-bold text-gray-500 uppercase">Card 2 Footnote Note</span>
+                  <input
+                    type="text"
+                    value={content.services_monthly_bookkeeping.card2Note}
+                    onChange={(e) =>
+                      setContent({
+                        ...content,
+                        services_monthly_bookkeeping: { ...content.services_monthly_bookkeeping, card2Note: e.target.value },
+                      })
+                    }
+                    className="w-full mt-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Services Financial Insights */}
+          {activeTab === 'services_financial_insights' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Heading
+                </label>
+                <input
+                  type="text"
+                  value={content.services_financial_insights.heading}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_financial_insights: { ...content.services_financial_insights, heading: e.target.value },
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-4">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  Deliverable Services (2 Items)
+                </label>
+                {content.services_financial_insights.services.map((s, idx) => (
+                  <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-2">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase">Service {idx + 1} Title</span>
+                    <input
+                      type="text"
+                      value={s.title}
+                      onChange={(e) => {
+                        const next = [...content.services_financial_insights.services];
+                        next[idx].title = e.target.value;
+                        setContent({
+                          ...content,
+                          services_financial_insights: { ...content.services_financial_insights, services: next },
+                        });
+                      }}
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900"
+                    />
+                    <span className="text-[11px] font-bold text-gray-500 uppercase block pt-2">Description</span>
+                    <textarea
+                      rows={3}
+                      value={s.description}
+                      onChange={(e) => {
+                        const next = [...content.services_financial_insights.services];
+                        next[idx].description = e.target.value;
+                        setContent({
+                          ...content,
+                          services_financial_insights: { ...content.services_financial_insights, services: next },
+                        });
+                      }}
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Services Cleanup */}
+          {activeTab === 'services_cleanup' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Heading
+                </label>
+                <input
+                  type="text"
+                  value={content.services_cleanup.heading}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_cleanup: { ...content.services_cleanup, heading: e.target.value },
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.services_cleanup.description}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_cleanup: { ...content.services_cleanup, description: e.target.value },
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Callout Box Title
+                </label>
+                <input
+                  type="text"
+                  value={content.services_cleanup.boxTitle}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_cleanup: { ...content.services_cleanup, boxTitle: e.target.value },
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-3">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  Cleanup Scope Bullets ({content.services_cleanup.bullets.length})
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {content.services_cleanup.bullets.map((b, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      value={b}
+                      onChange={(e) => {
+                        const next = [...content.services_cleanup.bullets];
+                        next[idx] = e.target.value;
+                        setContent({
+                          ...content,
+                          services_cleanup: { ...content.services_cleanup, bullets: next },
+                        });
+                      }}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Services Who Is It For */}
+          {activeTab === 'services_who_is_it_for' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_who_is_it_for.heading}
+                    onChange={(e) =>
+                      setContent({
+                        ...content,
+                        services_who_is_it_for: { ...content.services_who_is_it_for, heading: e.target.value },
+                      })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Intro Sentence
+                  </label>
+                  <input
+                    type="text"
+                    value={content.services_who_is_it_for.intro}
+                    onChange={(e) =>
+                      setContent({
+                        ...content,
+                        services_who_is_it_for: { ...content.services_who_is_it_for, intro: e.target.value },
+                      })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-3">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  Target Business Criteria ({content.services_who_is_it_for.items.length})
+                </label>
+                <div className="space-y-2">
+                  {content.services_who_is_it_for.items.map((item, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      value={item}
+                      onChange={(e) => {
+                        const next = [...content.services_who_is_it_for.items];
+                        next[idx] = e.target.value;
+                        setContent({
+                          ...content,
+                          services_who_is_it_for: { ...content.services_who_is_it_for, items: next },
+                        });
+                      }}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-3">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  Right-Side Scope Clarification
+                </label>
+                <input
+                  type="text"
+                  value={content.services_who_is_it_for.scopeTitle}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      services_who_is_it_for: { ...content.services_who_is_it_for, scopeTitle: e.target.value },
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 font-medium"
+                />
+                <div className="space-y-2">
+                  {content.services_who_is_it_for.scopeItems.map((item, idx) => (
+                    <textarea
+                      key={idx}
+                      rows={2}
+                      value={item}
+                      onChange={(e) => {
+                        const next = [...content.services_who_is_it_for.scopeItems];
+                        next[idx] = e.target.value;
+                        setContent({
+                          ...content,
+                          services_who_is_it_for: { ...content.services_who_is_it_for, scopeItems: next },
+                        });
+                      }}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Services Final CTA */}
+          {activeTab === 'services_final_cta' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Headline Text
+                </label>
+                <input
+                  type="text"
+                  value={content.services_final_cta.headline}
+                  onChange={(e) =>
+                    setContent({ ...content, services_final_cta: { ...content.services_final_cta, headline: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Body Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.services_final_cta.body}
+                  onChange={(e) =>
+                    setContent({ ...content, services_final_cta: { ...content.services_final_cta, body: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Button Label
+                </label>
+                <input
+                  type="text"
+                  value={content.services_final_cta.buttonText}
+                  onChange={(e) =>
+                    setContent({ ...content, services_final_cta: { ...content.services_final_cta, buttonText: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================= */}
+          {/* HOW IT WORKS PAGE SECTIONS */}
+          {/* ======================================================= */}
+
+          {/* How It Works Hero */}
+          {activeTab === 'how_it_works_hero' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Badge Label
+                </label>
+                <input
+                  type="text"
+                  value={content.how_it_works_hero.badge}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_hero: { ...content.how_it_works_hero, badge: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Main Headline
+                </label>
+                <input
+                  type="text"
+                  value={content.how_it_works_hero.heading}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_hero: { ...content.how_it_works_hero, heading: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Description Paragraph
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.how_it_works_hero.description}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_hero: { ...content.how_it_works_hero, description: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* How It Works Steps */}
+          {activeTab === 'how_it_works_steps' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
+                </label>
+                <input
+                  type="text"
+                  value={content.how_it_works_steps.heading}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_steps: { ...content.how_it_works_steps, heading: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-4">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  4 Timeline Steps
+                </label>
+                {content.how_it_works_steps.steps.map((step, idx) => (
+                  <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-7 h-7 rounded-full bg-[#111315] text-[#FEACC6] text-xs font-bold flex items-center justify-center shrink-0">
+                        {step.number}
+                      </span>
+                      <input
+                        type="text"
+                        value={step.title}
+                        onChange={(e) => {
+                          const next = [...content.how_it_works_steps.steps];
+                          next[idx].title = e.target.value;
+                          setContent({ ...content, how_it_works_steps: { ...content.how_it_works_steps, steps: next } });
+                        }}
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900 font-medium"
+                      />
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={step.description}
+                      onChange={(e) => {
+                        const next = [...content.how_it_works_steps.steps];
+                        next[idx].description = e.target.value;
+                        setContent({ ...content, how_it_works_steps: { ...content.how_it_works_steps, steps: next } });
+                      }}
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* How It Works Final CTA */}
+          {activeTab === 'how_it_works_final_cta' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Headline Text
+                </label>
+                <input
+                  type="text"
+                  value={content.how_it_works_final_cta.headline}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_final_cta: { ...content.how_it_works_final_cta, headline: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Body Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.how_it_works_final_cta.body}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_final_cta: { ...content.how_it_works_final_cta, body: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Button Label
+                </label>
+                <input
+                  type="text"
+                  value={content.how_it_works_final_cta.buttonText}
+                  onChange={(e) =>
+                    setContent({ ...content, how_it_works_final_cta: { ...content.how_it_works_final_cta, buttonText: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================= */}
+          {/* CONTACT PAGE SECTIONS */}
+          {/* ======================================================= */}
+
+          {/* Contact Hero */}
+          {activeTab === 'contact_hero' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Badge
+                </label>
+                <input
+                  type="text"
+                  value={content.contact_hero.badge}
+                  onChange={(e) =>
+                    setContent({ ...content, contact_hero: { ...content.contact_hero, badge: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={content.contact_hero.line1}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_hero: { ...content.contact_hero, line1: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Line 2
+                  </label>
+                  <input
+                    type="text"
+                    value={content.contact_hero.line2}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_hero: { ...content.contact_hero, line2: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Contact Form Info */}
+          {activeTab === 'contact_form_info' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Form Title Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={content.contact_form_info.headingLine1}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_form_info: { ...content.contact_form_info, headingLine1: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Form Title Line 2
+                  </label>
+                  <input
+                    type="text"
+                    value={content.contact_form_info.headingLine2}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_form_info: { ...content.contact_form_info, headingLine2: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Form Intro Paragraph
+                </label>
+                <textarea
+                  rows={3}
+                  value={content.contact_form_info.description}
+                  onChange={(e) =>
+                    setContent({ ...content, contact_form_info: { ...content.contact_form_info, description: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-3">
+                <label className="block text-xs font-semibold uppercase text-gray-600">
+                  Left-Side Guidance Box Title
+                </label>
+                <input
+                  type="text"
+                  value={content.contact_form_info.infoBoxTitle}
+                  onChange={(e) =>
+                    setContent({ ...content, contact_form_info: { ...content.contact_form_info, infoBoxTitle: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 font-medium"
+                />
+
+                <span className="text-[11px] font-bold text-gray-500 uppercase block pt-2">
+                  Guidance Checklist Bullets ({content.contact_form_info.infoBoxBullets.length})
+                </span>
+                <div className="space-y-2">
+                  {content.contact_form_info.infoBoxBullets.map((bullet, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      value={bullet}
+                      onChange={(e) => {
+                        const next = [...content.contact_form_info.infoBoxBullets];
+                        next[idx] = e.target.value;
+                        setContent({ ...content, contact_form_info: { ...content.contact_form_info, infoBoxBullets: next } });
+                      }}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                    />
+                  ))}
+                </div>
+
+                <div className="pt-2">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Company Base Note</span>
+                  <input
+                    type="text"
+                    value={content.contact_form_info.companyNote}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_form_info: { ...content.contact_form_info, companyNote: e.target.value } })
+                    }
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Contact Alternative */}
+          {activeTab === 'contact_alternative' && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Section Headline
+                </label>
+                <input
+                  type="text"
+                  value={content.contact_alternative.heading}
+                  onChange={(e) =>
+                    setContent({ ...content, contact_alternative: { ...content.contact_alternative, heading: e.target.value } })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-2">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase">Email Label & Value</span>
+                  <input
+                    type="text"
+                    value={content.contact_alternative.emailLabel}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, emailLabel: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                  />
+                  <input
+                    type="email"
+                    value={content.contact_alternative.emailValue}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, emailValue: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 font-medium"
+                  />
+                </div>
+
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-2">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase">Phone Label & Value</span>
+                  <input
+                    type="text"
+                    value={content.contact_alternative.phoneLabel}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, phoneLabel: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                  />
+                  <input
+                    type="text"
+                    value={content.contact_alternative.phoneValue}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, phoneValue: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 font-medium"
+                  />
+                </div>
+
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 space-y-2">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase">Hours Label & Value</span>
+                  <input
+                    type="text"
+                    value={content.contact_alternative.hoursLabel}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, hoursLabel: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900"
+                  />
+                  <input
+                    type="text"
+                    value={content.contact_alternative.hoursValue}
+                    onChange={(e) =>
+                      setContent({ ...content, contact_alternative: { ...content.contact_alternative, hoursValue: e.target.value } })
+                    }
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================= */}
+          {/* SITE-WIDE SETTINGS (FOOTER & GLOBAL) */}
+          {/* ======================================================= */}
           {activeTab === 'contact_info' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
                     Official Email
                   </label>
                   <input
                     type="email"
                     value={content.contact_info.email}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        contact_info: { ...content.contact_info, email: e.target.value },
-                      })
+                      setContent({ ...content, contact_info: { ...content.contact_info, email: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                    Phone Number
+                  <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                    Official Phone
                   </label>
                   <input
                     type="text"
                     value={content.contact_info.phone}
                     onChange={(e) =>
-                      setContent({
-                        ...content,
-                        contact_info: { ...content.contact_info, phone: e.target.value },
-                      })
+                      setContent({ ...content, contact_info: { ...content.contact_info, phone: e.target.value } })
                     }
-                    className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Office Physical Address
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Headquarters Physical Address
                 </label>
                 <input
                   type="text"
                   value={content.contact_info.address}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      contact_info: { ...content.contact_info, address: e.target.value },
-                    })
+                    setContent({ ...content, contact_info: { ...content.contact_info, address: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Footer Brand Summary Tagline
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Footer Brand Tagline
                 </label>
                 <textarea
                   rows={2}
                   value={content.contact_info.tagline}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      contact_info: { ...content.contact_info, tagline: e.target.value },
-                    })
+                    setContent({ ...content, contact_info: { ...content.contact_info, tagline: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">
-                  Footer Geographic Subtext
+                <label className="block text-xs font-semibold uppercase text-gray-600 mb-2">
+                  Footer Subtext
                 </label>
                 <input
                   type="text"
                   value={content.contact_info.subtext}
                   onChange={(e) =>
-                    setContent({
-                      ...content,
-                      contact_info: { ...content.contact_info, subtext: e.target.value },
-                    })
+                    setContent({ ...content, contact_info: { ...content.contact_info, subtext: e.target.value } })
                   }
-                  className="w-full bg-[#fdfdfd] border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
                 />
               </div>
             </div>
           )}
 
-          {/* Bottom Action Bar */}
+          {/* Bottom Save Action Bar */}
           <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-500">
-              Editing: <strong className="text-gray-900 font-semibold">{activeMeta?.label}</strong>
-            </span>
+            <button
+              type="button"
+              onClick={handleResetToDefault}
+              className="text-xs text-gray-500 hover:text-gray-800 font-medium underline flex items-center gap-1.5 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset this section to defaults</span>
+            </button>
+
             <button
               type="button"
               onClick={handleSaveActiveSection}
               disabled={isSaving}
-              className="bg-[#111315] hover:bg-black text-white font-medium text-xs tracking-wide px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shadow-sm active:scale-[0.98]"
+              className="bg-[#111315] hover:bg-black text-white font-medium text-xs px-6 py-2.5 rounded-xl transition-all shadow-md shadow-black/10 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <Save className="w-3.5 h-3.5" />
-              <span>{isSaving ? 'Publishing...' : 'Save Changes'}</span>
+              <Save className="w-4 h-4" />
+              <span>{isSaving ? 'Publishing Changes...' : 'Save & Publish Changes'}</span>
             </button>
           </div>
 
         </div>
+
       </div>
     </div>
   );

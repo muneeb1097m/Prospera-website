@@ -2,8 +2,9 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
+import { HowItWorksPageStepsContent } from "@/lib/content/defaults";
 
-const steps = [
+const defaultSteps = [
     {
         number: "1",
         title: "Financial Structure Review",
@@ -34,7 +35,24 @@ const steps = [
     },
 ];
 
-export default function HowItWorksSteps() {
+interface HowItWorksStepsProps {
+    content?: HowItWorksPageStepsContent;
+}
+
+export default function HowItWorksSteps({ content }: HowItWorksStepsProps) {
+    const heading = content?.heading || "The Process";
+
+    // Merge dynamic title/desc with static image/layout configs
+    const steps = defaultSteps.map((defaultStep, index) => {
+        const dynamicStep = content?.steps?.[index];
+        return {
+            ...defaultStep,
+            title: dynamicStep?.title || defaultStep.title,
+            description: dynamicStep?.description || defaultStep.description,
+            number: dynamicStep?.number || defaultStep.number,
+        };
+    });
+
     return (
         <section className="bg-white py-20 lg:py-32 overflow-hidden">
             <div className="container mx-auto px-6 lg:px-12 relative max-w-[1400px]">
@@ -47,7 +65,7 @@ export default function HowItWorksSteps() {
                         transition={{ duration: 0.8 }}
                         className="text-[2.5rem] lg:text-[4rem] font-serif font-normal text-[#111315]"
                     >
-                        The Process
+                        {heading}
                     </motion.h2>
                 </div>
 
